@@ -1,6 +1,7 @@
 #include <Vector.h>
 #include <Pair.h>
 #include <Arduino.h>
+#include <math.h>
 //#include <ArduinoSTL.h>
 
 //select line multiplexer variables
@@ -178,6 +179,21 @@ bool cell_balancing()
   int cell_bal5 = 35;
   int cell_bal6 = 36;
   int cell_bal7 = 4;
+
+  turnOff(cell_bal1);
+  turnOff(cell_bal2);
+  turnOff(cell_bal3);
+  turnOff(cell_bal4);
+  turnOff(cell_bal5);
+  turnOff(cell_bal6);
+
+  analogWrite (cell_bal0, 0);
+  analogWrite (cell_bal7, 0);
+
+  for(int i=0;i<=2;i++){
+    voltages[i].val_1=(round(voltages[i].val_1*1000))/1000.0;
+  }
+  
   if ((voltages[0].val_1) == (voltages[1].val_1) && (voltages[1].val_1) == (voltages[2].val_1)) {
     return true;  // do nothing
   }
@@ -191,7 +207,7 @@ bool cell_balancing()
       digitalWrite (cell_bal3, HIGH);
      }
     else {
-      //2nd cell SOC is the smallest
+      //2nd cell SOC is the smallest1
       analogWrite (cell_bal0, 64);
       analogWrite (cell_bal7, 64);
       digitalWrite (cell_bal5, HIGH);
@@ -280,8 +296,6 @@ void loop()
 	Thermal_management();
 	over_current();
   direction_of_flow_of_current();
-  while(balance == false){
-	balance = cell_balancing();
-  }
- delay(50);
+  balance = cell_balancing();
+  delay(50);
 }
