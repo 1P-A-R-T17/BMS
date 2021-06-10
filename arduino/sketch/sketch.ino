@@ -243,14 +243,23 @@ select_line_pins.push_back(28);
 
   
   pinMode(22, OUTPUT);
+  turnOff(22);
   pinMode(31, OUTPUT);
+  turnOff(31);
   pinMode(32, OUTPUT);
+  turnOff(32);
   pinMode(33, OUTPUT);
+  turnOff(33);
   pinMode(34, OUTPUT);
+  turnOff(34);
   pinMode(35, OUTPUT);
+  turnOff(35);
   pinMode(36, OUTPUT);
+  turnOff(36);
   pinMode(13, OUTPUT);
+  turnOff(13);
   pinMode(4, OUTPUT);
+  turnOff(4);
   
  //Control of PWM for Cell Balancing
   int myPretimer = 7;
