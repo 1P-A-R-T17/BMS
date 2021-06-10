@@ -237,15 +237,26 @@ select_line_pins.push_back(28);
 
 	pinMode(current_function_output, INPUT);
 	pinMode(temp_function_output, INPUT);
+  pinMode(A9, INPUT);
+  pinMode(A3, INPUT);
+  pinMode(A0, INPUT);
 
+  
+  pinMode(22, OUTPUT);
+  pinMode(31, OUTPUT);
+  pinMode(32, OUTPUT);
+  pinMode(33, OUTPUT);
+  pinMode(34, OUTPUT);
+  pinMode(35, OUTPUT);
+  pinMode(36, OUTPUT);
+  pinMode(13, OUTPUT);
+  pinMode(4, OUTPUT);
+  
  //Control of PWM for Cell Balancing
   int myPretimer = 7;
   TCCR0B &= ~myPretimer;           
   int myReqtimer = 4;
   TCCR0B |= myReqtimer;
-  pinMode (13, OUTPUT);
-  pinMode (4, OUTPUT);
-
 }
 
 void loop()
