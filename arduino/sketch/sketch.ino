@@ -287,6 +287,9 @@ select_line_pins.push_back(28);
 void loop()
 {
   bool balance = false;
+  current_sense.clear();
+  temp_sense.clear();
+  voltages.clear();
 	// put your main code here, to run repeatedly:
 	voltage_sensing();
   total_voltage_sensing();
@@ -298,4 +301,5 @@ void loop()
   direction_of_flow_of_current();
   balance = cell_balancing();
   delay(50);
+  
 }
