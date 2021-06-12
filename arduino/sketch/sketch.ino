@@ -168,6 +168,17 @@ void over_current()
  }
 }
 
+void voltage_protection()
+{
+  //over voltage protection
+  int relayPin = 22;
+  for(int i=0;i<series_cells;i++){
+    if (voltages[i].val_1 > 4.20 || voltages[i].val_1 < 2.90){
+      turnOn(relayPin);
+      }   
+  }
+}
+
 bool cell_balancing()
 {
   //cell balancing
@@ -292,6 +303,7 @@ void loop()
   voltages.clear();
 	// put your main code here, to run repeatedly:
 	voltage_sensing();
+  voltage_protection();
   total_voltage_sensing();
 	current_sensing();
 	total_current_sensing();
