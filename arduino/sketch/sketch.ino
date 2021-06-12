@@ -161,10 +161,10 @@ void Thermal_management()
 void over_current()
 {
 	//Over Current protection
-  double cellcurrent = total_current_sensing();
+  double cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
-  turnOn(relayPin);
+    turnOn(relayPin);
  }
 }
 
