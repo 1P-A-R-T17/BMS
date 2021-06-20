@@ -94,15 +94,25 @@ void current_sensing()
 	}
 }
 
-void voltage_sensing()
+void voltage_sensing()    
 {
 	// sensing voltage of each cell
-
+  int i = 0; 
+  int comm_code = 1;
+  int incoming_data = 0;
+  Serial.print(comm_code);                             
 	for (int pin = A0; pin< (A0 + series_cells); pin++)//(int pin = 97; pin > 97 - series_cells; pin--)
 	{
 		volt_measurement m(analogRead(pin) *(5 / 1024), pin);
 		voltages.push_back(m);
-	}
+    while (!Serial.available()){
+      //do nothing
+    }
+    incoming_data = Serial.read();   
+    if(incoming_data == comm_code){
+      Serial.print(voltages[i++].val_1);          
+    }
+   } 
 }
 
 //turn on the relay
@@ -338,6 +348,7 @@ void loop()
   else{
     turnOff(relayPin);
   }
+  
   direction_of_flow_of_current();
   balance = cell_balancing();
   delay(50);
