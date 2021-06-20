@@ -4,6 +4,9 @@
 #include <math.h>
 //#include <ArduinoSTL.h>
 
+//relayPin declaration
+const int relayPin=22;
+
 //select line multiplexer variables
 Vector<int> select_line_pins; //{25, 26, 27, 28};       //{ 75, 74, 73, 72 }
 
@@ -120,15 +123,15 @@ bool direction_of_flow_of_current()
 	double current = total_current_sensing();
 	if (current > 0.00)
 	{
-		return 1;
+		return 1; //Discharging
 	}
 	else
 	{
-		return 0;
+		return 0; //Charging
 	}
 }
 
-void Thermal_management()
+bool Thermal_management()
 {
 	// opens the relay contacts if the temperature is not within the permissible limits
 	int pinout = 22; //78
@@ -138,16 +141,18 @@ void Thermal_management()
 		if (charge == true)
 		{
 			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000)
-				 turnOn(pinout);  //digitalWrite(pinout, HIGH) 
+				 return 1;  //digitalWrite(pinout, HIGH) 
+				//stop the program
 			else
-				turnOff(pinout);  //digitalWrite(pinout, LOW)
+				return 0;  //digitalWrite(pinout, LOW)
 		}
 		else
 		{
 			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000)
-				turnOn(pinout);  // digitalWrite(pinout, HIGH)
+				return 1; // digitalWrite(pinout, HIGH)
+				//stop the program
 			else
-				turnOff(pinout);  //digitalWrite(pinout, LOW)
+				return 0;  //digitalWrite(pinout, LOW)
 		}
 	}
 }
@@ -158,24 +163,37 @@ void Thermal_management()
     5V Vcc: Connects the Arduino’s 5V pin
     Signal: Carries the trigger signal from the Arduino that activates the relay
  */
-void over_current()
+bool over_current()
 {
 	//Over Current protection
   double cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
-    turnOn(relayPin);
+    return 1;
+	  //stop the program
  }
 }
 
-void voltage_protection()
+bool voltage_protection()
 {
-  //over voltage protection
   int relayPin = 22;
-  for(int i=0;i<series_cells;i++){
-    if (voltages[i].val_1 > 4.20 || voltages[i].val_1 < 2.90){
-      turnOn(relayPin);
-      }   
+  if(!direction_of_flow_of_current()){ //if it's charging
+    for(int i=0;i<series_cells;i++){
+      if (voltages[i].val_1 > 4.20){ //over voltage protection
+        return 1;
+	      //introduce battery capacity calculation measures
+        }
+     }
+  }
+  else if(direction_of_flow_of_current()){
+    for(int i=0; i<series_cells; i++){
+      if(voltages[i].val_1 <= 2.90){ //under voltage protection
+        return 1;      
+      }    
+    }
+  }
+  else{
+    return 0; // continue standard ops
   }
 }
 
@@ -261,7 +279,7 @@ select_line_pins.push_back(28);
 		pinMode(select_line_pins[i], OUTPUT);
 		turnOff(select_line_pins[i]);  //digitalWrite(select_line_pins[i]
 	}
-
+  
 	pinMode(current_function_output, INPUT);
 	pinMode(temp_function_output, INPUT);
   pinMode(A9, INPUT);
@@ -303,13 +321,23 @@ void loop()
   voltages.clear();
 	// put your main code here, to run repeatedly:
 	voltage_sensing();
-  voltage_protection();
-  total_voltage_sensing();
-	current_sensing();
-	total_current_sensing();
-	Temperature_sense();
-	Thermal_management();
-	over_current();
+	total_voltage_sensing();
+  current_sensing();
+  total_current_sensing();
+  Temperature_sense();
+  
+	if (voltage_protection()){
+    turnOn(relayPin);
+	}
+  else if(Thermal_management()){
+    turnOn(relayPin);
+  }
+	else if(over_current()){
+    turnOn(relayPin);
+	}
+  else{
+    turnOff(relayPin);
+  }
   direction_of_flow_of_current();
   balance = cell_balancing();
   delay(50);
