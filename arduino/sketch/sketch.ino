@@ -120,11 +120,11 @@ bool direction_of_flow_of_current()
 	double current = total_current_sensing();
 	if (current > 0.00)
 	{
-		return 1;
+		return 1; //Discharging
 	}
 	else
 	{
-		return 0;
+		return 0; //Charging
 	}
 }
 
@@ -170,12 +170,24 @@ void over_current()
 
 void voltage_protection()
 {
-  //over voltage protection
   int relayPin = 22;
-  for(int i=0;i<series_cells;i++){
-    if (voltages[i].val_1 > 4.20 || voltages[i].val_1 < 2.90){
-      turnOn(relayPin);
-      }   
+  if(!direction_of_flow_of_current()){ //if it's charging
+    for(int i=0;i<series_cells;i++){
+      if (voltages[i].val_1 > 4.20){ //over voltage protection
+        turnOn(relayPin);
+	      //introduce battery capacity calculation measures
+        }
+     }
+  }
+  else if(direction_of_flow_of_current()){
+    for(int i=0; i<series_cells; i++){
+      if(voltages[i].val_1 <= 2.90){ //under voltage protection
+        turnOn(relayPin);      
+      }    
+    }
+  }
+  else{
+    turnOff(relayPin); // continue standard ops
   }
 }
 
