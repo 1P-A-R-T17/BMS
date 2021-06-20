@@ -63,12 +63,22 @@ double total_voltage_sensing()
 
 void Temperature_sense()
 {
+  int i = 0;
+  int comm_code = 5;
+  int incoming_data = 0;
 	for (int tempPin = 0; tempPin < total_cells; tempPin++)
   {
 	  select_Multiplexer_Pin(tempPin);
 	  delay(5);
 	  temp_measurement m(analogRead(temp_function_output) *0.48828125, tempPin);
 	  temp_sense.push_back(m);	// read analog volt from sensor and save to vector temp_sense
+    while (!Serial.available()){
+      //do nothing
+    }
+    incoming_data = Serial.read();   
+    if(incoming_data == comm_code){
+      Serial.print(temp_sense[i++].val_1);          
+    }
   }	// convert the analog volt to its temperature equivalent  
 }	// for LM35 IC we have to multiply temperature with 0.48828125
 /*LM35 sensor has three terminals - Vs, Vout and GND. We will connect the sensor as follows −
@@ -82,7 +92,7 @@ void current_sensing()
 {
 	int raw_voltage = 0;
 	int voltage = 0;
-  int comm_code = 2;
+  int comm_code = 3;
   int incoming_data = 0;
   int i = 0;
   Serial.print(comm_code);
