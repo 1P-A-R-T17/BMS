@@ -139,6 +139,7 @@ void Thermal_management()
 		{
 			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000)
 				 turnOn(pinout);  //digitalWrite(pinout, HIGH) 
+				//stop the program
 			else
 				turnOff(pinout);  //digitalWrite(pinout, LOW)
 		}
@@ -146,6 +147,7 @@ void Thermal_management()
 		{
 			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000)
 				turnOn(pinout);  // digitalWrite(pinout, HIGH)
+				//stop the program
 			else
 				turnOff(pinout);  //digitalWrite(pinout, LOW)
 		}
@@ -165,6 +167,7 @@ void over_current()
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
     turnOn(relayPin);
+	  //stop the program
  }
 }
 
