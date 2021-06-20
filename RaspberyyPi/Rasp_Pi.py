@@ -7,11 +7,8 @@ import time
 ser=serial.Serial("/dev/ttyACM0",9600)
 ser.baudrate=9600
 #defining all the input varaiables
-float ah = 7.5
-float totv #total voltage of the battery pack (*)
-float batcapideal = 94.5
-float batcappract
-float soh
+ah = 7.5
+batcapideal = 94.5
 
 def read_Arduinoinputs():
 	#Write code here
