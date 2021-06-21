@@ -254,12 +254,19 @@ bool Thermal_management()
 bool over_current()
 {
 	//Over Current protection
+  int comm_code = 9;
+  int incoming_data = 0;
   double cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
+    Serial.print(comm_code);
+    while (!Serial.available()){
+    //do nothing
+    }   
+    incoming_data = Serial.read();
     return 1;
 	  //stop the program
- }
+  }
 }
 
 bool voltage_protection()
