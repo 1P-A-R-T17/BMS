@@ -68,8 +68,18 @@ double total_current_sensing()
 double total_voltage_sensing()
 {
 	// senses the overall voltage of the battery pack
+  int comm_code = 2;
+  int incoming_data = 0;
+  Serial.print(comm_code); 
 	int totvolpin = A3; //94
 	double totalVol = (analogRead(totvolpin)) *(5 / 1024);
+  while (!Serial.available()){
+    //do nothing
+  }
+  incoming_data = Serial.read();   
+  if(incoming_data == comm_code){
+    Serial.print(totalVol);          
+  }
 	return totalVol;
 }
 
