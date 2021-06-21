@@ -271,10 +271,17 @@ bool over_current()
 
 bool voltage_protection()
 {
-  int relayPin = 22;
+  int comm_code_over_voltage_protection = 6;
+  int comm_code_under_voltage_protection = 7;
+  int incoming_data = 0;
   if(!direction_of_flow_of_current()){ //if it's charging
     for(int i=0;i<series_cells;i++){
       if (voltages[i].val_1 > 4.20){ //over voltage protection
+        Serial.print(comm_code_over_voltage_protection);
+        while (!Serial.available()){
+        //do nothing
+        }   
+        incoming_data = Serial.read();
         return 1;
 	      //introduce battery capacity calculation measures
         }
@@ -283,6 +290,11 @@ bool voltage_protection()
   else if(direction_of_flow_of_current()){
     for(int i=0; i<series_cells; i++){
       if(voltages[i].val_1 <= 2.90){ //under voltage protection
+        Serial.print(comm_code_under_voltage_protection);
+        while (!Serial.available()){
+        //do nothing
+        }   
+        incoming_data = Serial.read(); 
         return 1;      
       }    
     }
