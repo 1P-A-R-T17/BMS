@@ -173,13 +173,34 @@ void turnOff(int relayPin)
 //charging-discharging
 bool direction_of_flow_of_current()
 {
+  int comm_code_charge = 10;
+  int comm_code_discharge = 11;
+  int incoming_data = 0;
 	double current = total_current_sensing();
+  int charge = 0;
+  int discharge = 1;
 	if (current > 0.00)
 	{
+    Serial.print(comm_code_discharge);
+    while (!Serial.available()){
+     //do nothing
+    }
+    incoming_data = Serial.read();   
+    if(incoming_data == comm_code_discharge){
+      Serial.print(discharge);          
+    }
 		return 1; //Discharging
 	}
 	else
 	{
+    Serial.print(comm_code_charge);
+    while (!Serial.available()){
+     //do nothing
+    }
+    incoming_data = Serial.read();   
+    if(incoming_data == comm_code_charge){
+      Serial.print(charge);          
+    }
 		return 0; //Charging
 	}
 }
