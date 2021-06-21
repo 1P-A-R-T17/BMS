@@ -326,14 +326,28 @@ bool cell_balancing()
   analogWrite (cell_bal0, 0);
   analogWrite (cell_bal7, 0);
 
+  int comm_code_balance_off = 13;
+  int comm_code_balance_on = 12;
+  int incoming_data = 0;
+  
   for(int i=0;i<=2;i++){
     voltages[i].val_1=(round(voltages[i].val_1*1000))/1000.0;
   }
   
   if ((voltages[0].val_1) == (voltages[1].val_1) && (voltages[1].val_1) == (voltages[2].val_1)) {
+    Serial.print(comm_code_balance_off); //cell balancing offgoing
+    while (!Serial.available()){
+    //do nothing
+    }   
+    incoming_data = Serial.read();
     return true;  // do nothing
   }
   else {
+    Serial.print(comm_code_balance_on); //cell balancing ongoing
+    while (!Serial.available()){
+    //do nothing
+    }   
+    incoming_data = Serial.read();
     if ((voltages[0].val_1) >= (voltages[1].val_1)) {
      if ((voltages[1].val_1) >= (voltages[2].val_1)) {
       //3rd cell SOC is the smallest
@@ -365,10 +379,6 @@ bool cell_balancing()
     digitalWrite (cell_bal4, HIGH);
    }
   delay(5);
-  if(voltages[0].val_1 == voltages[1].val_1 && voltages[1].val_1 == voltages[2].val_1)
-  return true;
-
-
 }
   return false;
 }
