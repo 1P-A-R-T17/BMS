@@ -48,9 +48,21 @@ double total_current_sensing()
 {
 	// senses the overall current of the battery pack
 	int adcVoltage_pin = A9; //88
+  int comm_code = 4;
+  int incoming_data = 0;
+  Serial.print(comm_code); 
 	double adcValue = analogRead(adcVoltage_pin);
 	double cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
-	return ((cellcurrent - offsetVoltage) / sensetivity);	//returns the current sensed
+  double total_current = ((cellcurrent - offsetVoltage) / sensetivity);
+  while (!Serial.available()){
+     //do nothing
+   }
+  incoming_data = Serial.read();   
+  if(incoming_data == comm_code){
+     Serial.print(total_current);          
+  }
+	return total_current;	//returns the current sensed
+  
 }
 
 double total_voltage_sensing()
@@ -66,6 +78,7 @@ void Temperature_sense()
   int i = 0;
   int comm_code = 5;
   int incoming_data = 0;
+  Serial.print(comm_code); 
 	for (int tempPin = 0; tempPin < total_cells; tempPin++)
   {
 	  select_Multiplexer_Pin(tempPin);
