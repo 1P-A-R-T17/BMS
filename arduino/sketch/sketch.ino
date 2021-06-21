@@ -208,27 +208,41 @@ bool direction_of_flow_of_current()
 bool Thermal_management()
 {
 	// opens the relay contacts if the temperature is not within the permissible limits
-	int pinout = 22; //78
+  int comm_code = 8;
+  int incoming_data = 0;
+  int j = 0;
 	bool charge = direction_of_flow_of_current();
 	for (int i = 0; i < series_cells; i++)
 	{
 		if (charge == true)
 		{
-			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000)
-				 return 1;  //digitalWrite(pinout, HIGH) 
+			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000){
+        Serial.print(comm_code);
+        while (!Serial.available()){
+        //do nothing
+        }
+        incoming_data = Serial.read();
+			  return 1;  //digitalWrite(pinout, HIGH) 
 				//stop the program
-			else
-				return 0;  //digitalWrite(pinout, LOW)
+			}
+		  else
+				return 0;//digitalWrite(pinout, LOW)
 		}
-		else
-		{
-			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000)
-				return 1; // digitalWrite(pinout, HIGH)
-				//stop the program
-			else
-				return 0;  //digitalWrite(pinout, LOW)
-		}
-	}
+		  else
+		  {
+			  if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000){
+          Serial.print(comm_code);
+          while (!Serial.available()){
+          //do nothing
+          }   
+          incoming_data = Serial.read();
+				  return 1; // digitalWrite(pinout, HIGH)
+				  //stop the program
+			  }
+		    else
+				  return 0;  //digitalWrite(pinout, LOW)
+	    }
+	 }
 }
 
 /*A 5V relay module is used                                                         
