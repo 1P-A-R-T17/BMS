@@ -48,16 +48,38 @@ double total_current_sensing()
 {
 	// senses the overall current of the battery pack
 	int adcVoltage_pin = A9; //88
+  int comm_code = 4;
+  int incoming_data = 0;
+  Serial.print(comm_code); 
 	double adcValue = analogRead(adcVoltage_pin);
 	double cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
-	return ((cellcurrent - offsetVoltage) / sensetivity);	//returns the current sensed
+  double total_current = ((cellcurrent - offsetVoltage) / sensetivity);
+  while (!Serial.available()){
+     //do nothing
+   }
+  incoming_data = Serial.read();   
+  if(incoming_data == comm_code){
+     Serial.print(total_current);          
+  }
+	return total_current;	//returns the current sensed
+  
 }
 
 double total_voltage_sensing()
 {
 	// senses the overall voltage of the battery pack
+  int comm_code = 2;
+  int incoming_data = 0;
+  Serial.print(comm_code); 
 	int totvolpin = A3; //94
 	double totalVol = (analogRead(totvolpin)) *(5 / 1024);
+  while (!Serial.available()){
+    //do nothing
+  }
+  incoming_data = Serial.read();   
+  if(incoming_data == comm_code){
+    Serial.print(totalVol);          
+  }
 	return totalVol;
 }
 
@@ -66,6 +88,7 @@ void Temperature_sense()
   int i = 0;
   int comm_code = 5;
   int incoming_data = 0;
+  Serial.print(comm_code); 
 	for (int tempPin = 0; tempPin < total_cells; tempPin++)
   {
 	  select_Multiplexer_Pin(tempPin);
@@ -150,13 +173,34 @@ void turnOff(int relayPin)
 //charging-discharging
 bool direction_of_flow_of_current()
 {
+  int comm_code_charge = 10;
+  int comm_code_discharge = 11;
+  int incoming_data = 0;
 	double current = total_current_sensing();
+  int charge = 0;
+  int discharge = 1;
 	if (current > 0.00)
 	{
+    Serial.print(comm_code_discharge);
+    while (!Serial.available()){
+     //do nothing
+    }
+    incoming_data = Serial.read();   
+    if(incoming_data == comm_code_discharge){
+      Serial.print(discharge);          
+    }
 		return 1; //Discharging
 	}
 	else
 	{
+    Serial.print(comm_code_charge);
+    while (!Serial.available()){
+     //do nothing
+    }
+    incoming_data = Serial.read();   
+    if(incoming_data == comm_code_charge){
+      Serial.print(charge);          
+    }
 		return 0; //Charging
 	}
 }
@@ -164,27 +208,41 @@ bool direction_of_flow_of_current()
 bool Thermal_management()
 {
 	// opens the relay contacts if the temperature is not within the permissible limits
-	int pinout = 22; //78
+  int comm_code = 8;
+  int incoming_data = 0;
+  int j = 0;
 	bool charge = direction_of_flow_of_current();
 	for (int i = 0; i < series_cells; i++)
 	{
 		if (charge == true)
 		{
-			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000)
-				 return 1;  //digitalWrite(pinout, HIGH) 
+			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000){
+        Serial.print(comm_code);
+        while (!Serial.available()){
+        //do nothing
+        }
+        incoming_data = Serial.read();
+			  return 1;  //digitalWrite(pinout, HIGH) 
 				//stop the program
-			else
-				return 0;  //digitalWrite(pinout, LOW)
+			}
+		  else
+				return 0;//digitalWrite(pinout, LOW)
 		}
-		else
-		{
-			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000)
-				return 1; // digitalWrite(pinout, HIGH)
-				//stop the program
-			else
-				return 0;  //digitalWrite(pinout, LOW)
-		}
-	}
+		  else
+		  {
+			  if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000){
+          Serial.print(comm_code);
+          while (!Serial.available()){
+          //do nothing
+          }   
+          incoming_data = Serial.read();
+				  return 1; // digitalWrite(pinout, HIGH)
+				  //stop the program
+			  }
+		    else
+				  return 0;  //digitalWrite(pinout, LOW)
+	    }
+	 }
 }
 
 /*A 5V relay module is used                                                         
@@ -196,20 +254,34 @@ bool Thermal_management()
 bool over_current()
 {
 	//Over Current protection
+  int comm_code = 9;
+  int incoming_data = 0;
   double cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
+    Serial.print(comm_code);
+    while (!Serial.available()){
+    //do nothing
+    }   
+    incoming_data = Serial.read();
     return 1;
 	  //stop the program
- }
+  }
 }
 
 bool voltage_protection()
 {
-  int relayPin = 22;
+  int comm_code_over_voltage_protection = 6;
+  int comm_code_under_voltage_protection = 7;
+  int incoming_data = 0;
   if(!direction_of_flow_of_current()){ //if it's charging
     for(int i=0;i<series_cells;i++){
       if (voltages[i].val_1 > 4.20){ //over voltage protection
+        Serial.print(comm_code_over_voltage_protection);
+        while (!Serial.available()){
+        //do nothing
+        }   
+        incoming_data = Serial.read();
         return 1;
 	      //introduce battery capacity calculation measures
         }
@@ -218,6 +290,11 @@ bool voltage_protection()
   else if(direction_of_flow_of_current()){
     for(int i=0; i<series_cells; i++){
       if(voltages[i].val_1 <= 2.90){ //under voltage protection
+        Serial.print(comm_code_under_voltage_protection);
+        while (!Serial.available()){
+        //do nothing
+        }   
+        incoming_data = Serial.read(); 
         return 1;      
       }    
     }
@@ -249,14 +326,28 @@ bool cell_balancing()
   analogWrite (cell_bal0, 0);
   analogWrite (cell_bal7, 0);
 
+  int comm_code_balance_off = 13;
+  int comm_code_balance_on = 12;
+  int incoming_data = 0;
+  
   for(int i=0;i<=2;i++){
     voltages[i].val_1=(round(voltages[i].val_1*1000))/1000.0;
   }
   
   if ((voltages[0].val_1) == (voltages[1].val_1) && (voltages[1].val_1) == (voltages[2].val_1)) {
+    Serial.print(comm_code_balance_off); //cell balancing offgoing
+    while (!Serial.available()){
+    //do nothing
+    }   
+    incoming_data = Serial.read();
     return true;  // do nothing
   }
   else {
+    Serial.print(comm_code_balance_on); //cell balancing ongoing
+    while (!Serial.available()){
+    //do nothing
+    }   
+    incoming_data = Serial.read();
     if ((voltages[0].val_1) >= (voltages[1].val_1)) {
      if ((voltages[1].val_1) >= (voltages[2].val_1)) {
       //3rd cell SOC is the smallest
@@ -288,10 +379,6 @@ bool cell_balancing()
     digitalWrite (cell_bal4, HIGH);
    }
   delay(5);
-  if(voltages[0].val_1 == voltages[1].val_1 && voltages[1].val_1 == voltages[2].val_1)
-  return true;
-
-
 }
   return false;
 }
