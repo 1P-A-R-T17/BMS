@@ -1,0 +1,4 @@
+The argument '-tgtconn_server_info_file' passed to rtiostream_tcpip is not valid and will be ignored.
+The argument 'C:\Users\rachi\AppData\Local\Temp\tgtconnpa8b7a6f7_c96e_4cda_83a2_ba4c225ea8b2.info' passed to rtiostream_tcpip is not valid and will be ignored.
+The argument '-tgtconn_port' passed to rtiostream_tcpip is not valid and will be ignored.
+The argument '0' passed to rtiostream_tcpip is not valid and will be ignored.
