@@ -50,7 +50,7 @@ double total_current_sensing()
 	int adcVoltage_pin = A9; //88
   int comm_code = 4;
   int incoming_data = 0;
-  Serial.print(comm_code); 
+  Serial.println(comm_code); 
 	double adcValue = analogRead(adcVoltage_pin);
 	double cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
   double total_current = ((cellcurrent - offsetVoltage) / sensetivity);
@@ -59,7 +59,7 @@ double total_current_sensing()
    }
   incoming_data = Serial.read();   
   //if(incoming_data == comm_code){
-  Serial.print(total_current);          
+  Serial.println(total_current);          
   //}
 	return total_current;	//returns the current sensed
   
@@ -70,7 +70,7 @@ double total_voltage_sensing()
 	// senses the overall voltage of the battery pack
   int comm_code = 2;
   int incoming_data = 0;
-  Serial.print(comm_code); 
+  Serial.println(comm_code); 
 	int totvolpin = A3; //94
 	double totalVol = (analogRead(totvolpin)) *(5 / 1024);
   while (!Serial.available()){
@@ -78,7 +78,7 @@ double total_voltage_sensing()
   }
   incoming_data = Serial.read();   
   //if(incoming_data == comm_code){
-  Serial.print(totalVol);          
+  Serial.println(totalVol);          
   //}
 	return totalVol;
 }
@@ -88,7 +88,7 @@ void Temperature_sense()
   int i = 0;
   int comm_code = 5;
   int incoming_data = 0;
-  Serial.print(comm_code); 
+  Serial.println(comm_code); 
 	for (int tempPin = 0; tempPin < total_cells; tempPin++)
   {
 	  select_Multiplexer_Pin(tempPin);
@@ -100,7 +100,7 @@ void Temperature_sense()
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.print(temp_sense[i++].val_1);          
+    Serial.println(temp_sense[i++].val_1);          
     //}
   }	// convert the analog volt to its temperature equivalent  
 }	// for LM35 IC we have to multiply temperature with 0.48828125
@@ -118,7 +118,7 @@ void current_sensing()
   int comm_code = 3;
   int incoming_data = 0;
   int i = 0;
-  Serial.print(comm_code);
+  Serial.println(comm_code);
 	for (int cur_Pin = 0; cur_Pin < total_cells; cur_Pin++)
 	{
 		select_Multiplexer_Pin(cur_Pin);
@@ -132,7 +132,7 @@ void current_sensing()
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.print(current_sense[i++].val_1);          
+    Serial.println(current_sense[i++].val_1);          
     //}
 	}
 }
@@ -143,7 +143,7 @@ void voltage_sensing()
   int i = 0; 
   int comm_code = 1;
   int incoming_data = 0;
-  Serial.print(comm_code);                             
+  Serial.println(comm_code);                             
 	for (int pin = A0; pin< (A0 + series_cells); pin++)//(int pin = 97; pin > 97 - series_cells; pin--)
 	{
 		volt_measurement m(analogRead(pin) *(5 / 1024), pin);
@@ -153,7 +153,7 @@ void voltage_sensing()
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.print(voltages[i++].val_1);          
+    Serial.println(voltages[i++].val_1);          
     //}
    } 
 }
@@ -181,25 +181,25 @@ bool direction_of_flow_of_current()
   int discharge = 1;
 	if (current > 0.00)
 	{
-    Serial.print(comm_code_discharge);
+    Serial.println(comm_code_discharge);
     while (!Serial.available()){
      //do nothing
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code_discharge){
-    Serial.print(discharge);          
+    Serial.println(discharge);          
     //}
 		return 1; //Discharging
 	}
 	else
 	{
-    Serial.print(comm_code_charge);
+    Serial.println(comm_code_charge);
     while (!Serial.available()){
      //do nothing
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code_charge){
-    Serial.print(charge);          
+    Serial.println(charge);          
     //}
 		return 0; //Charging
 	}
@@ -217,7 +217,7 @@ bool Thermal_management()
 		if (charge == true)
 		{
 			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000){
-        Serial.print(comm_code);
+        Serial.println(comm_code);
         while (!Serial.available()){
         //do nothing
         }
@@ -231,7 +231,7 @@ bool Thermal_management()
 		  else
 		  {
 			  if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000){
-          Serial.print(comm_code);
+          Serial.println(comm_code);
           while (!Serial.available()){
           //do nothing
           }   
@@ -259,7 +259,7 @@ bool over_current()
   double cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
-    Serial.print(comm_code);
+    Serial.println(comm_code);
     while (!Serial.available()){
     //do nothing
     }   
@@ -277,7 +277,7 @@ bool voltage_protection()
   if(!direction_of_flow_of_current()){ //if it's charging
     for(int i=0;i<series_cells;i++){
       if (voltages[i].val_1 > 4.20){ //over voltage protection
-        Serial.print(comm_code_over_voltage_protection);
+        Serial.println(comm_code_over_voltage_protection);
         while (!Serial.available()){
         //do nothing
         }   
@@ -290,7 +290,7 @@ bool voltage_protection()
   else if(direction_of_flow_of_current()){
     for(int i=0; i<series_cells; i++){
       if(voltages[i].val_1 <= 2.90){ //under voltage protection
-        Serial.print(comm_code_under_voltage_protection);
+        Serial.println(comm_code_under_voltage_protection);
         while (!Serial.available()){
         //do nothing
         }   
@@ -335,7 +335,7 @@ bool cell_balancing()
   }
   
   if ((voltages[0].val_1) == (voltages[1].val_1) && (voltages[1].val_1) == (voltages[2].val_1)) {
-    Serial.print(comm_code_balance_off); //cell balancing offgoing
+    Serial.println(comm_code_balance_off); //cell balancing offgoing
     while (!Serial.available()){
     //do nothing
     }   
@@ -343,7 +343,7 @@ bool cell_balancing()
     return true;  // do nothing
   }
   else {
-    Serial.print(comm_code_balance_on); //cell balancing ongoing
+    Serial.println(comm_code_balance_on); //cell balancing ongoing
     while (!Serial.available()){
     //do nothing
     }   
@@ -378,7 +378,7 @@ bool cell_balancing()
     digitalWrite (cell_bal1, HIGH);
     digitalWrite (cell_bal4, HIGH);
    }
-  delay(5);
+  delay(1);
 }
   return false;
 }
@@ -468,5 +468,4 @@ void loop()
   direction_of_flow_of_current();
   balance = cell_balancing();
   delay(50);
-  
 }

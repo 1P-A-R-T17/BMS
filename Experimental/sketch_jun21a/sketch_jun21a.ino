@@ -5,7 +5,7 @@
 
 int pin = A0;
 float voltage = 0;
-int comm_code = 1;
+int comm_code = 9;
 
 void setup() {
   // put your setup code here, to run once:
