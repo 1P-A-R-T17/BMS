@@ -1,8 +1,10 @@
 #  * - means doubt regarding it. Might work, might not. Need practical testing
 
 import serial
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import time
+import numpy as np
+import pandas as pd
 
 ser=serial.Serial("/dev/ttyACM0",9600)
 ser.baudrate=9600

@@ -58,9 +58,9 @@ double total_current_sensing()
      //do nothing
    }
   incoming_data = Serial.read();   
-  if(incoming_data == comm_code){
-     Serial.print(total_current);          
-  }
+  //if(incoming_data == comm_code){
+  Serial.print(total_current);          
+  //}
 	return total_current;	//returns the current sensed
   
 }
@@ -77,9 +77,9 @@ double total_voltage_sensing()
     //do nothing
   }
   incoming_data = Serial.read();   
-  if(incoming_data == comm_code){
-    Serial.print(totalVol);          
-  }
+  //if(incoming_data == comm_code){
+  Serial.print(totalVol);          
+  //}
 	return totalVol;
 }
 
@@ -99,9 +99,9 @@ void Temperature_sense()
       //do nothing
     }
     incoming_data = Serial.read();   
-    if(incoming_data == comm_code){
-      Serial.print(temp_sense[i++].val_1);          
-    }
+    //if(incoming_data == comm_code){
+    Serial.print(temp_sense[i++].val_1);          
+    //}
   }	// convert the analog volt to its temperature equivalent  
 }	// for LM35 IC we have to multiply temperature with 0.48828125
 /*LM35 sensor has three terminals - Vs, Vout and GND. We will connect the sensor as follows −
@@ -123,7 +123,7 @@ void current_sensing()
 	{
 		select_Multiplexer_Pin(cur_Pin);
 		delay(5);
-		raw_voltage = (analogRead(current_function_output) / 1024.0) *5000;	//converts digital value to mV
+		raw_voltage = (analogRead(current_function_output) / 1024.0) *5000.0;	//converts digital value to mV
 		voltage = ((raw_voltage - offsetVoltage) / sensetivity);	//stores the current sensed in vector
 		current_measurement c(voltage, cur_Pin);
 		current_sense.push_back(c);
@@ -131,9 +131,9 @@ void current_sensing()
       //do nothing
     }
     incoming_data = Serial.read();   
-    if(incoming_data == comm_code){
-      Serial.print(current_sense[i++].val_1);          
-    }
+    //if(incoming_data == comm_code){
+    Serial.print(current_sense[i++].val_1);          
+    //}
 	}
 }
 
@@ -152,9 +152,9 @@ void voltage_sensing()
       //do nothing
     }
     incoming_data = Serial.read();   
-    if(incoming_data == comm_code){
-      Serial.print(voltages[i++].val_1);          
-    }
+    //if(incoming_data == comm_code){
+    Serial.print(voltages[i++].val_1);          
+    //}
    } 
 }
 
@@ -186,9 +186,9 @@ bool direction_of_flow_of_current()
      //do nothing
     }
     incoming_data = Serial.read();   
-    if(incoming_data == comm_code_discharge){
-      Serial.print(discharge);          
-    }
+    //if(incoming_data == comm_code_discharge){
+    Serial.print(discharge);          
+    //}
 		return 1; //Discharging
 	}
 	else
@@ -198,9 +198,9 @@ bool direction_of_flow_of_current()
      //do nothing
     }
     incoming_data = Serial.read();   
-    if(incoming_data == comm_code_charge){
-      Serial.print(charge);          
-    }
+    //if(incoming_data == comm_code_charge){
+    Serial.print(charge);          
+    //}
 		return 0; //Charging
 	}
 }
@@ -385,7 +385,7 @@ bool cell_balancing()
 
 void setup()
 {
-Serial.begin(9600);
+Serial.begin(19200);
 select_line_pins.push_back(25);
 select_line_pins.push_back(26);
 select_line_pins.push_back(27);
@@ -428,6 +428,15 @@ select_line_pins.push_back(28);
   TCCR0B &= ~myPretimer;           
   int myReqtimer = 4;
   TCCR0B |= myReqtimer;
+
+  delay(1000);
+  while (!Serial.available()){
+      //do nothing
+      digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(LED_BUILTIN, LOW);
+  }
+  int begin_program = Serial.read();
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop()
