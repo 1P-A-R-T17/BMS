@@ -61,6 +61,7 @@ double total_current_sensing()
   //if(incoming_data == comm_code){
   Serial.println(total_current);          
   //}
+  delay(1);
 	return total_current;	//returns the current sensed
   
 }
@@ -80,6 +81,7 @@ double total_voltage_sensing()
   //if(incoming_data == comm_code){
   Serial.println(totalVol);          
   //}
+  delay(1);
 	return totalVol;
 }
 
@@ -100,7 +102,8 @@ void Temperature_sense()
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.println(temp_sense[i++].val_1);          
+    Serial.println(temp_sense[i++].val_1);
+    delay(1);          
     //}
   }	// convert the analog volt to its temperature equivalent  
 }	// for LM35 IC we have to multiply temperature with 0.48828125
@@ -132,7 +135,8 @@ void current_sensing()
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.println(current_sense[i++].val_1);          
+    Serial.println(current_sense[i++].val_1);
+    delay(1);          
     //}
 	}
 }
@@ -153,7 +157,8 @@ void voltage_sensing()
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.println(voltages[i++].val_1);          
+    Serial.println(voltages[i++].val_1);
+    delay(1);          
     //}
    } 
 }
@@ -173,34 +178,13 @@ void turnOff(int relayPin)
 //charging-discharging
 bool direction_of_flow_of_current()
 {
-  int comm_code_charge = 10;
-  int comm_code_discharge = 11;
-  int incoming_data = 0;
 	double current = total_current_sensing();
-  int charge = 0;
-  int discharge = 1;
-	if (current > 0.00)
+	if (current > 0.10)
 	{
-    Serial.println(comm_code_discharge);
-    while (!Serial.available()){
-     //do nothing
-    }
-    incoming_data = Serial.read();   
-    //if(incoming_data == comm_code_discharge){
-    Serial.println(discharge);          
-    //}
 		return 1; //Discharging
 	}
 	else
 	{
-    Serial.println(comm_code_charge);
-    while (!Serial.available()){
-     //do nothing
-    }
-    incoming_data = Serial.read();   
-    //if(incoming_data == comm_code_charge){
-    Serial.println(charge);          
-    //}
 		return 0; //Charging
 	}
 }
@@ -267,6 +251,7 @@ bool over_current()
     return 1;
 	  //stop the program
   }
+  return 0;
 }
 
 bool voltage_protection()
@@ -442,6 +427,7 @@ select_line_pins.push_back(28);
 void loop()
 {
   bool balance = false;
+  bool charge;
   current_sense.clear();
   temp_sense.clear();
   voltages.clear();
@@ -460,12 +446,29 @@ void loop()
   }
 	else if(over_current()){
     turnOn(relayPin);
+    delay(60000);
 	}
   else{
     turnOff(relayPin);
   }
   
-  direction_of_flow_of_current();
+  charge = direction_of_flow_of_current();
+  int comm_code_charge = 10;
+  int comm_code_discharge = 11;
+  int incoming_data;
+  if(charge){
+    Serial.println(comm_code_charge);
+    while (!Serial.available()){
+     //do nothing
+    }
+    incoming_data = Serial.read();
+  }
+  else{
+    Serial.println(comm_code_discharge);
+    while (!Serial.available()){
+     //do nothing
+    }
+    incoming_data = Serial.read();             
+  }
   balance = cell_balancing();
-  delay(50);
 }
