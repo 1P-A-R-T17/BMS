@@ -22,25 +22,25 @@ def read_cellvolts():
     for i in series_cell:
         comm_code = 1
         ser.write(comm_code)
-        parallel_v[i] = ser.readline()
+        parallel_v[i] = float(ser.readline())
 
 def read_totalvolts():
     ser.write('2')
-    totv = ser.readline()
+    totv = float(ser.readline())
     
 def read_cellamps():
     for i in totalcell:
         ser.write('3')
-        cur_cell[i] = ser.readline()
+        cur_cell[i] = float(ser.readline())
         
 def read_totalamps():
     ser.write('4')
-    totamp = ser.readline()
+    totamp =float(ser.readline())
     
 def read_temperature():
     for i in totalcell:
         ser.write('5')
-        temp_cell[i] = ser.readline()
+        temp_cell[i] = float(ser.readline())
 
 def send_outputsArduino():
 	#Write code here
@@ -50,7 +50,7 @@ while True:
     while ser.in_waiting<=0:
         pass
     
-    comm_code = ser.read()
+    comm_code = int(ser.readline())
     if comm_code == 1:
         read_cellvolts()
     elif comm_code == 2:
