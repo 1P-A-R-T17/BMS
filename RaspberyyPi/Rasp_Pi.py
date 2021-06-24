@@ -46,6 +46,13 @@ def send_outputsArduino():
 	#Write code here
     pass 
 
+def soh_calculation():
+    #Battery capacity calculation
+	time.sleep(60)
+	read_totalvolts()
+	batcappract = ah * totv
+	soh = batcappract / 94.5
+
 while True:
     while ser.in_waiting<=0:
         pass
@@ -85,4 +92,8 @@ while True:
     elif comm_code == 13:
         #inform cell balance off
         pass
+    
+    if totv == 12.6:
+        #Battery SoH calculation
+        soh_calculation()
         
