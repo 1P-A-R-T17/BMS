@@ -2,6 +2,8 @@ import serial
 import time
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+from tensorflow import keras
 
 ser=serial.Serial("/dev/ttyACM0",19200)
 ah = 7.5
@@ -13,11 +15,27 @@ beginProgram = 1
 parallel_v = []
 cur_cell = []
 temp_cell = []
+totv = 0
+totamp = 0
+soc = []
+model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
 return_code = 1
 
 time.sleep(1)
 
 ser.write(beginProgram)
+
+def predict_soc():
+    for i in totalcell:
+        if i<=2:
+            x=0
+        elif i>2 and i<=5:
+            x=1
+        else:
+            x=2
+        
+        soc[i]=model.predict([[cur_cell[i], temp_cell[i], parallel_v[x]]])
+    
 
 def read_cellvolts():
     for i in series_cell:
@@ -41,6 +59,7 @@ def read_temperature():
     for i in totalcell:
         ser.write(return_code)
         temp_cell[i] = float(ser.readline())
+        predict_soc()
 
 def send_outputsArduino():
 	#Write code here
