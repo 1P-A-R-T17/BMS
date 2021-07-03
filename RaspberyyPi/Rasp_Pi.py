@@ -51,16 +51,18 @@ def predict_soc():
     
 
 def read_cellvolts():
-    for i in series_cell:
+    for i in range(series_cell):
         ser.write(return_code)
         parallel_v[i] = float(ser.readline())
+
+
 
 def read_totalvolts():
     ser.write(return_code)
     totv = float(ser.readline())
     
 def read_cellamps():
-    for i in totalcell:
+    for i in range(totalcell):
         ser.write(return_code)
         cur_cell[i] = float(ser.readline())
         
@@ -69,7 +71,7 @@ def read_totalamps():
     totamp =float(ser.readline())
     
 def read_temperature():
-    for i in totalcell:
+    for i in range(totalcell):
         ser.write(return_code)
         temp_cell[i] = float(ser.readline())
         predict_soc()
