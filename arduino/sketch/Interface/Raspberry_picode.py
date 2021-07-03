@@ -23,6 +23,8 @@ return_code = 1
 
 time.sleep(1)
 
+flag = 0
+
 ser.write(beginProgram)
 
 def predict_soc():
@@ -69,17 +71,9 @@ def send_outputsArduino():
 
 def soh_calculation(totv):
 	#Battery capacity calculation
-	toc = time.perf_counter()
-	count = toc - tic
-	if count >= 60:
-		read_Arduino()
-		batcappract = ah * totv
-		soh = batcappract / 94.5
-		break
-	else
-		read_Arduino()
-		recallsoh()
-		break
+	batcappract = ah * totv
+	soh = batcappract / 94.5
+		
 
 while True:
     while ser.in_waiting<=0:
@@ -122,7 +116,16 @@ while True:
         	#inform cell balance off
         	ser.write(return_code)
  
-    if totv == 12.6:
+    if totv >= 12.55 and flag==0:
         #Battery SoH calculation
-	tic = time.perf_counter()
-        soh_calculation()
+        tic = time.perf_counter()
+        flag=1
+    
+    if flag==1:
+        toc = time.perf_counter()
+        count = toc - tic
+        if count>=70:
+            soh_calculation(totv)
+            flag=0
+    
+    
