@@ -25,12 +25,12 @@ series_cell = 3
 parallel_cell = 3
 totalcell = series_cell * parallel_cell
 beginProgram = 1
-parallel_v = []
-cur_cell = []
-temp_cell = []
+parallel_v = [0.0, 0.0, 0.0]
+cur_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+temp_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 totv = 0
 totamp = 0
-soc = []
+soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
 return_code = 1
 
