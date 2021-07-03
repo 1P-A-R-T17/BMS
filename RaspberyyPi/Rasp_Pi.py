@@ -144,13 +144,25 @@ while True:
         read_temperature()
     elif comm_code == 6:
         #inform influxdb of overvoltage
+        Error_code = Point("Battery_error") \
+            .field("over_voltage", 1)\
+        
+        write_api.write(bucket, org, Error_code)
         ser.write(return_code) #write at end of block
     elif comm_code == 7:
-        #inform influxdb of undervoltage
-        ser.write(return_code)
+         #inform influxdb of undervoltage
+         Error_code = Point("Battery_error")\
+             .field("under_voltage", 1) \
+        
+         write_api.write(bucket, org, Error_code)
+         ser.write(return_code)
     elif comm_code == 8:
         #inform influxdb of thermal error
-        ser.write(return_code)
+         Error_code = Point("Battery_error")\
+             .field("Temperature_error", 1) \
+                 
+         write_api.write(bucket, org, Error_code)
+         ser.write(return_code)
     elif comm_code == 9:
         #inform influxdb of overCurrent
         ser.write(return_code)
