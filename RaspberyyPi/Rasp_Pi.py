@@ -179,6 +179,10 @@ while True:
         ser.write(return_code)
     elif comm_code == 11:
         #inform influxdb of discharging
+        Error_code = Point("Battery_error") \
+            .field("discharging", 1)\
+        
+        write_api.write(bucket, org, Error_code)
         ser.write(return_code)
     elif comm_code == 12:
         #inform cell balance on
