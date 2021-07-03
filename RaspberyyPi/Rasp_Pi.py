@@ -165,7 +165,11 @@ while True:
          ser.write(return_code)
     elif comm_code == 9:
         #inform influxdb of overCurrent
-        ser.write(return_code)
+        Error_code = Point("Battery_error") \
+            .field("over_current", 1)\
+        
+        write_api.write(bucket, org, Error_code)
+        ser.write(return_code) #write at end of block
     elif comm_code == 10:
         #inform influxdb of charging
         ser.write(return_code)
