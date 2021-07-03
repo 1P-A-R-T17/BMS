@@ -72,6 +72,12 @@ def read_cellamps():
     for i in range(totalcell):
         ser.write(return_code)
         cur_cell[i] = float(ser.readline())
+        string = 'current' + str(i)
+        point = Point("Battery") \
+            .tag("Type","current") \
+            .field(string, cur_cell[i]) \
+                
+        write_api.write(bucket, org, point)        
         
 def read_totalamps():
     ser.write(return_code)
