@@ -54,6 +54,13 @@ def read_cellvolts():
     for i in range(series_cell):
         ser.write(return_code)
         parallel_v[i] = float(ser.readline())
+        string = 'voltage' + str(i)
+        point = Point("Battery") \
+            .tag("Type", "Voltage") \
+            .field(string, parallel_v[i]) \
+            #.time(datetime.utcnow(), WritePrecision.NS)
+
+        write_api.write(bucket, org, point)
 
 
 
