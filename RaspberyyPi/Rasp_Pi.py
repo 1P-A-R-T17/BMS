@@ -98,11 +98,19 @@ def read_temperature():
     for i in range(totalcell):
         ser.write(return_code)
         temp_cell[i] = float(ser.readline())
+        string = 'temperature' + str(i)
+        point = Point("Battery") \
+            .tag("Type","temperature") \
+            .field(string, temp_cell[i]) \
+                
+        write_api.write(bucket, org, point)
         predict_soc()
 
+"""
 def send_outputsArduino():
 	#Write code here
     pass 
+"""
 """
 def soh_calculation(totv):
     #Battery capacity calculation
