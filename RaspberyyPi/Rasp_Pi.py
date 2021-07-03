@@ -88,6 +88,11 @@ def read_cellamps():
 def read_totalamps():
     ser.write(return_code)
     totamp =float(ser.readline())
+    point = Point("Battery") \
+        .tag("Type","current") \
+        .field("Total Current", totamp) \
+                
+    write_api.write(bucket, org, point)
     
 def read_temperature():
     for i in range(totalcell):
