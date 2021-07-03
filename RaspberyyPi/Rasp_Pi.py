@@ -19,19 +19,27 @@ client = InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", 
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
 ser=serial.Serial("/dev/ttyACM0",19200)
+
 ah = 7.5
 batcapideal = 94.5
+
 series_cell = 3
 parallel_cell = 3
 totalcell = series_cell * parallel_cell
+
 beginProgram = 1
+
+flag=0
+
 parallel_v = [0.0, 0.0, 0.0]
 cur_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 temp_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 totv = 0
 totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
 model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
+
 return_code = 1
 
 time.sleep(1)
@@ -54,8 +62,6 @@ def predict_soc():
             .field(string, soc[i]) \
     
         write_api.write(bucket, org, point)
-            
-    
     
 
 def read_cellvolts():
@@ -114,19 +120,16 @@ def read_temperature():
         write_api.write(bucket, org, point)
         predict_soc()
 
-"""
-def send_outputsArduino():
-	#Write code here
-    pass 
-"""
-"""
 def soh_calculation(totv):
     #Battery capacity calculation
-	time.sleep(60)
-	read_totalvolts()
-	batcappract = ah * totv
-	soh = batcappract / 94.5
-"""
+    batcappract = ah * totv
+    soh = batcappract /94.5
+    point = Point("Battery") \
+        .tag("Type", "State of Health") \
+        .field("SoH", soh)
+        
+    write_api.write(bucket, org, point)
+    
 while True:
     while ser.in_waiting<=0:
         pass
@@ -148,6 +151,8 @@ while True:
             .field("over_voltage", 1)\
         
         write_api.write(bucket, org, Error_code)
+        tic = time.perf_counter()
+        flag=1
         ser.write(return_code) #write at end of block
     elif comm_code == 7:
          #inform influxdb of undervoltage
@@ -198,8 +203,11 @@ while True:
         
         write_api.write(bucket, org, Error_code)
         ser.write(return_code)
-"""    
-    if totv == 12.6:
-        #Battery SoH calculation
-        soh_calculation()
-"""      
+        
+
+    if flag==1:
+        toc = time.perf_counter()
+        count = toc - tic
+        if count>=70:
+            soh_calculation(totv)
+            flag=0
