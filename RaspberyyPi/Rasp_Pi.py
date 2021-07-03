@@ -16,7 +16,7 @@ bucket = "Battery Management"
 
 client = InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token)
 
-
+write_api = client.write_api(write_options=SYNCHRONOUS)
 
 ser=serial.Serial("/dev/ttyACM0",19200)
 ah = 7.5
