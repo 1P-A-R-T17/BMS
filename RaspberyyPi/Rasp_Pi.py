@@ -186,9 +186,17 @@ while True:
         ser.write(return_code)
     elif comm_code == 12:
         #inform cell balance on
+        Error_code = Point("Battery_error") \
+            .field("Cell Balance ON", 1)\
+        
+        write_api.write(bucket, org, Error_code)
         ser.write(return_code)
     elif comm_code == 13:
         #inform cell balance off
+        Error_code = Point("Battery_error") \
+            .field("Cell Balance OFF", 1)\
+        
+        write_api.write(bucket, org, Error_code)
         ser.write(return_code)
 """    
     if totv == 12.6:
