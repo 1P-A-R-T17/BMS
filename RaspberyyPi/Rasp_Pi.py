@@ -5,6 +5,19 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 
+from datetime import datetime
+
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
+
+token = "teXoimWzBPEly43ay2Gp8F3NosQjw6QZPrd_NF-e8Kl5GaeGd_QwerxsuGoDSO5hCeJZtEFystHJCW2t8Qt1Xg=="
+org = "1-PART-17"
+bucket = "Battery Management"
+
+client = InfluxDBClient(url="https://eu-central-1-1.aws.cloud2.influxdata.com", token=token)
+
+
+
 ser=serial.Serial("/dev/ttyACM0",19200)
 ah = 7.5
 batcapideal = 94.5
