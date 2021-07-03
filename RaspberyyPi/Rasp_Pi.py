@@ -67,6 +67,12 @@ def read_cellvolts():
 def read_totalvolts():
     ser.write(return_code)
     totv = float(ser.readline())
+    point = Point("Battery") \
+        .tag("Type", "Voltage") \
+        .field("Total Voltage", totv) \
+        #.time(datetime.utcnow(), WritePrecision.NS)
+
+    write_api.write(bucket, org, point)
     
 def read_cellamps():
     for i in range(totalcell):
