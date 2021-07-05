@@ -1,11 +1,8 @@
-import time
 import random
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
-
-from datetime import datetime
 
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -29,7 +26,7 @@ totv = 0
 totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-pd.read_csv('C:\\Users\\Abhishek\\OneDrive\\Desktop\\BMS_NN_dataset')
+df = pd.read_csv('C:\\Users\\Abhishek\\OneDrive\\Desktop\\BMS_NN_dataset')
 df.loc[:, 'Temperature'] = 25
 CSV_COLUMN_NAMES = ['Current', 'Temperature', 'Voltage', 'SoC']
 current = df.pop('Current')
@@ -40,7 +37,7 @@ soc = df.pop('SoC')
 model = keras.models.load_model('D:\\Battery Management System\\Code\\BMS\\NeuralNetwok\\soc_predictor.h5')
 
 def predict_soc():
-    for j in totalcell:
+    for j in range(9):
         if j<=2:
             x=0
         elif j>2 and j<=5:
