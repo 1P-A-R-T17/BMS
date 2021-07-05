@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
+import time
 
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -26,15 +27,15 @@ totv = 0
 totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-df = pd.read_csv('C:\\Users\\Abhishek\\OneDrive\\Desktop\\BMS_NN_dataset')
-df.loc[:, 'Temperature'] = 25
 CSV_COLUMN_NAMES = ['Current', 'Temperature', 'Voltage', 'SoC']
+df = pd.read_csv('C:\\Users\\rachi\\Desktop\\NeuralNetwok\\BMS_NN_dataset.csv', names = CSV_COLUMN_NAMES, header = 0)
+#df.loc[:, 'Temperature'] = 25
 current = df.pop('Current')
 temperature = df.pop('Temperature')
 voltage = df.pop('Voltage')
 soc = df.pop('SoC')
 
-model = keras.models.load_model('D:\\Battery Management System\\Code\\BMS\\NeuralNetwok\\soc_predictor.h5')
+model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
 
 def predict_soc():
     for j in range(9):
@@ -54,6 +55,7 @@ def predict_soc():
         write_api.write(bucket, org, point)
 
 for i in range(1000):
+    toc = time.perf_counter()
     vol = voltage[i]
     for j in range(3):
         parallel_v[j] = voltage[i]
@@ -89,13 +91,13 @@ for i in range(1000):
                 
     write_api.write(bucket, org, point)
     
-    temp = temperature[i]
+    temp = float(temperature[i])
     for j in range(9):
-        temp_cell[j] = temperature[i]
-        string = 'temperature' + str(i)
+        #temp_cell[j] = temperature[i]
+        string = 'temperature' + str(j)
         point = Point("Battery") \
             .tag("Type","temperature") \
-            .field(string, temp_cell[i]) \
+            .field(string, temp) \
                 
         write_api.write(bucket, org, point)
         predict_soc()
@@ -121,7 +123,9 @@ for i in range(1000):
             .field("discharging", 1)\
         
         write_api.write(bucket, org, Error_code)
-        
+    
+    tic = time.perf_counter()
+    print(tic-toc)
         
         
         
