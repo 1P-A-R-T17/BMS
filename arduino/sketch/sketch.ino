@@ -14,22 +14,22 @@ const int current_function_output = A8;	//Pin number(89) for current sensing
 const int temp_function_output = A13;	//Pin number(84) for temperature sensing
 
 //voltage sensing variable
-Vector<Pair<double, int>> voltages;
-typedef Pair<double, int> volt_measurement;
+Vector<Pair<float, int>> voltages;
+typedef Pair<float, int> volt_measurement;
 const int series_cells = 3;
 const int parallel_cells = 3;
 const int total_cells = series_cells * parallel_cells;
 
 //Variables for current Sensing
-Vector<Pair<double, int>> current_sense;
-typedef Pair<double, int> current_measurement;
+Vector<Pair<float, int>> current_sense;
+typedef Pair<float, int> current_measurement;
 
 const int sensetivity = 185;	//As per datasheet of ACS712 for range of 5A
 const int offsetVoltage = 2500;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
 
 //Variables for Temperature sensing
-Vector<Pair<double, int>> temp_sense;
-typedef Pair<double, int> temp_measurement;
+Vector<Pair<float, int>> temp_sense;
+typedef Pair<float, int> temp_measurement;
 
 //working of multiplexer function
 void select_Multiplexer_Pin(byte pin)
@@ -44,16 +44,16 @@ void select_Multiplexer_Pin(byte pin)
 	}
 }
 
-double total_current_sensing()
+float total_current_sensing()
 {
 	// senses the overall current of the battery pack
 	int adcVoltage_pin = A9; //88
   int comm_code = 4;
   int incoming_data = 0;
   Serial.println(comm_code); 
-	double adcValue = analogRead(adcVoltage_pin);
-	double cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
-  double total_current = ((cellcurrent - offsetVoltage) / sensetivity);
+	float adcValue = analogRead(adcVoltage_pin);
+	float cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
+  float total_current = ((cellcurrent - offsetVoltage) / sensetivity);
   while (!Serial.available()){
      //do nothing
    }
@@ -66,14 +66,14 @@ double total_current_sensing()
   
 }
 
-double total_voltage_sensing()
+float total_voltage_sensing()
 {
 	// senses the overall voltage of the battery pack
   int comm_code = 2;
   int incoming_data = 0;
   Serial.println(comm_code); 
 	int totvolpin = A3; //94
-	double totalVol = (analogRead(totvolpin)) *(5 / 1024);
+	float totalVol = (analogRead(totvolpin)) *(5 / 1024);
   while (!Serial.available()){
     //do nothing
   }
@@ -178,7 +178,7 @@ void turnOff(int relayPin)
 //charging-discharging
 bool direction_of_flow_of_current()
 {
-	double current = total_current_sensing();
+	float current = total_current_sensing();
 	if (current > 0.10)
 	{
 		return 1; //Discharging
@@ -240,7 +240,7 @@ bool over_current()
 	//Over Current protection
   int comm_code = 9;
   int incoming_data = 0;
-  double cellcurrent = abs(total_current_sensing());
+  float cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
     Serial.println(comm_code);
