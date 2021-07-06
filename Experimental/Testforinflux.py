@@ -101,17 +101,17 @@ for i in range(1000):
                 
         write_api.write(bucket, org, point)
         predict_soc()
+    """
         
-    def soh_calculation(totv):
-    #Battery capacity calculation
-        batcappract= ah * totv
-        soh = batcappract /94.5
-        point = Point("Battery") \
-            .tag("Type", "State of Health") \
-            .field("SoH", soh)
+
+
+    soh = 1
+    point = Point("Battery") \
+        .tag("Type", "State of Health") \
+        .field("SoH", soh)
         
-        write_api.write(bucket, org, point)
-        """
+    write_api.write(bucket, org, point)
+    
     
     
     Error_code = Point("Battery_error") \
