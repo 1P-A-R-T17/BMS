@@ -25,7 +25,7 @@ temp_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 totv = 0
 totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
+"""
 CSV_COLUMN_NAMES = ['Current', 'Temperature', 'Voltage', 'SoC']
 df = pd.read_csv('C:\\Users\\Abhishek\\OneDrive\\Desktop\\BMS_NN_dataset.csv', names = CSV_COLUMN_NAMES, header = 0)
 #df.loc[:, 'Temperature'] = 25
@@ -52,9 +52,10 @@ def predict_soc():
             .field(string, soc[j]) \
     
         write_api.write(bucket, org, point)
-
+"""
 for i in range(1000):
     toc = time.perf_counter()
+    """
     vol = voltage[i]
     for j in range(3):
         parallel_v[j] = voltage[i]
@@ -110,6 +111,7 @@ for i in range(1000):
             .field("SoH", soh)
         
         write_api.write(bucket, org, point)
+        """
     
     
     Error_code = Point("Battery_error") \

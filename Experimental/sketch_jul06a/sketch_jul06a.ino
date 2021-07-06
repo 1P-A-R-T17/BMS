@@ -10,8 +10,8 @@ const int relayPin=22;
 //select line multiplexer variables
 Vector<int> select_line_pins; //{25, 26, 27, 28};       //{ 75, 74, 73, 72 }
 
-const int current_function_output = A8;	//Pin number(89) for current sensing
-const int temp_function_output = A13;	//Pin number(84) for temperature sensing
+const int current_function_output = A8;  //Pin number(89) for current sensing
+const int temp_function_output = A13; //Pin number(84) for temperature sensing
 
 //voltage sensing variable
 Vector<Pair<float, int>> voltages;
@@ -24,8 +24,8 @@ const int total_cells = series_cells * parallel_cells;
 Vector<Pair<float, int>> current_sense;
 typedef Pair<float, int> current_measurement;
 
-const int sensetivity = 185;	//As per datasheet of ACS712 for range of 5A
-const int offsetVoltage = 2500;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
+const int sensetivity = 185;  //As per datasheet of ACS712 for range of 5A
+const int offsetVoltage = 2500; //(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
 
 //Variables for Temperature sensing
 Vector<Pair<float, int>> temp_sense;
@@ -34,55 +34,55 @@ typedef Pair<float, int> temp_measurement;
 //working of multiplexer function
 void select_Multiplexer_Pin(byte pin)
 {
-	if (pin > total_cells) return;	// Exit the function if it is out of bound
-	for (auto i = 0; i < select_line_pins.size(); i++)
-	{
-		if (pin &(1 << i))   //shifting the bits to activate the specific select lines
-			turnOn(select_line_pins[i]);  //digitalWrite(select_line_pins[i], HIGH)
-		else
-			turnOff(select_line_pins[i]);  //digitalWrite(select_line_pins[i], LOW)
-	}
+  if (pin > total_cells) return;  // Exit the function if it is out of bound
+  for (auto i = 0; i < select_line_pins.size(); i++)
+  {
+    if (pin &(1 << i))   //shifting the bits to activate the specific select lines
+      turnOn(select_line_pins[i]);  //digitalWrite(select_line_pins[i], HIGH)
+    else
+      turnOff(select_line_pins[i]);  //digitalWrite(select_line_pins[i], LOW)
+  }
 }
 
 float total_current_sensing()
 {
-	// senses the overall current of the battery pack
-	int adcVoltage_pin = A9; //88
+  // senses the overall current of the battery pack
+  int adcVoltage_pin = A9; //88
   int comm_code = 4;
   int incoming_data = 0;
   Serial.println(comm_code); 
-	float adcValue = analogRead(adcVoltage_pin);
-	float cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
+  float adcValue = analogRead(adcVoltage_pin);
+  float cellcurrent = (adcValue / 1024.0) *5000;  //converts digital value to mV
   float total_current = ((cellcurrent - offsetVoltage) / sensetivity);
-  while (!Serial.available()){
+  /*while (!Serial.available()){
      //do nothing
    }
-  incoming_data = Serial.read();   
+  incoming_data = Serial.read();*/   
   //if(incoming_data == comm_code){
   Serial.println(total_current);          
   //}
   delay(1);
-	return total_current;	//returns the current sensed
+  return total_current; //returns the current sensed
   
 }
 
 float total_voltage_sensing()
 {
-	// senses the overall voltage of the battery pack
+  // senses the overall voltage of the battery pack
   int comm_code = 2;
   int incoming_data = 0;
   Serial.println(comm_code); 
-	int totvolpin = A3; //94
-	float totalVol = (analogRead(totvolpin)) *(5 / 1024);
-  while (!Serial.available()){
+  int totvolpin = A3; //94
+  float totalVol = (analogRead(totvolpin)) *(5 / 1024);
+  /*while (!Serial.available()){
     //do nothing
   }
-  incoming_data = Serial.read();   
+  incoming_data = Serial.read();*/   
   //if(incoming_data == comm_code){
   Serial.println(totalVol);          
   //}
   delay(1);
-	return totalVol;
+  return totalVol;
 }
 
 void Temperature_sense()
@@ -91,22 +91,22 @@ void Temperature_sense()
   int comm_code = 5;
   int incoming_data = 0;
   Serial.println(comm_code); 
-	for (int tempPin = 0; tempPin < total_cells; tempPin++)
+  for (int tempPin = 0; tempPin < total_cells; tempPin++)
   {
-	  select_Multiplexer_Pin(tempPin);
-	  delay(5);
-	  temp_measurement m(analogRead(temp_function_output) *0.48828125, tempPin);
-	  temp_sense.push_back(m);	// read analog volt from sensor and save to vector temp_sense
-    while (!Serial.available()){
+    select_Multiplexer_Pin(tempPin);
+    delay(5);
+    temp_measurement m(analogRead(temp_function_output) *0.48828125, tempPin);
+    temp_sense.push_back(m);  // read analog volt from sensor and save to vector temp_sense
+    /*while (!Serial.available()){
       //do nothing
     }
-    incoming_data = Serial.read();   
+    incoming_data = Serial.read();*/   
     //if(incoming_data == comm_code){
     Serial.println(temp_sense[i++].val_1);
     delay(1);          
     //}
-  }	// convert the analog volt to its temperature equivalent  
-}	// for LM35 IC we have to multiply temperature with 0.48828125
+  } // convert the analog volt to its temperature equivalent  
+} // for LM35 IC we have to multiply temperature with 0.48828125
 /*LM35 sensor has three terminals - Vs, Vout and GND. We will connect the sensor as follows −
 Connect the +Vs to +5v on your Arduino board.
 Connect Vout to Analog0 or A0 on Arduino board.
@@ -116,46 +116,47 @@ So with a +5 volt reference, the digital approximation will be equal to input vo
 
 void current_sensing()
 {
-	int raw_voltage = 0;
-	int voltage = 0;
+  int raw_voltage = 0;
+  int voltage = 0;
   int comm_code = 3;
   int incoming_data = 0;
   int i = 0;
   Serial.println(comm_code);
-	for (int cur_Pin = 0; cur_Pin < total_cells; cur_Pin++)
-	{
-		select_Multiplexer_Pin(cur_Pin);
-		delay(5);
-		raw_voltage = (analogRead(current_function_output) / 1024.0) *5000.0;	//converts digital value to mV
-		voltage = ((raw_voltage - offsetVoltage) / sensetivity);	//stores the current sensed in vector
-		current_measurement c(voltage, cur_Pin);
-		current_sense.push_back(c);
-    while (!Serial.available()){
+  for (int cur_Pin = 0; cur_Pin < total_cells; cur_Pin++)
+  {
+    Serial.flush();
+    select_Multiplexer_Pin(cur_Pin);
+    delay(5);
+    raw_voltage = (analogRead(current_function_output) / 1024.0) *5000.0; //converts digital value to mV
+    voltage = ((raw_voltage - offsetVoltage) / sensetivity);  //stores the current sensed in vector
+    current_measurement c(voltage, cur_Pin);
+    current_sense.push_back(c);
+    /*while (!Serial.available()){
       //do nothing
     }
-    incoming_data = Serial.read();   
+    incoming_data = Serial.read(); */  
     //if(incoming_data == comm_code){
     Serial.println(current_sense[i++].val_1);
     delay(50);          
     //}
-	}
+  }
 }
 
 void voltage_sensing()    
 {
-	// sensing voltage of each cell
+  // sensing voltage of each cell
   int i = 0; 
   int comm_code = 1;
   int incoming_data = 0;
   Serial.println(comm_code);                             
-	for (int pin = A0; pin< (A0 + series_cells); pin++)//(int pin = 97; pin > 97 - series_cells; pin--)
-	{
-		volt_measurement m(analogRead(pin) *(5 / 1024), pin);
-		voltages.push_back(m);
-    while (!Serial.available()){
+  for (int pin = A0; pin< (A0 + series_cells); pin++)//(int pin = 97; pin > 97 - series_cells; pin--)
+  {
+    volt_measurement m(analogRead(pin) *(5 / 1024), pin);
+    voltages.push_back(m);
+    /*while (!Serial.available()){
       //do nothing
     }
-    incoming_data = Serial.read();   
+    incoming_data = Serial.read(); */  
     //if(incoming_data == comm_code){
     Serial.println(voltages[i++].val_1);
     delay(1);          
@@ -166,67 +167,67 @@ void voltage_sensing()
 //turn on the relay
 void turnOn(int relayPin)
 {
-	digitalWrite(relayPin, HIGH);	//normally open
+  digitalWrite(relayPin, HIGH); //normally open
 }
 
 // turn off the relay
 void turnOff(int relayPin)
 {
-	digitalWrite(relayPin, LOW);	//normally close
+  digitalWrite(relayPin, LOW);  //normally close
 }
 
 //charging-discharging
 bool direction_of_flow_of_current()
 {
-	float current = total_current_sensing();
-	if (current > 0.10)
-	{
-		return 1; //Discharging
-	}
-	else
-	{
-		return 0; //Charging
-	}
+  float current = total_current_sensing();
+  if (current > 0.10)
+  {
+    return 1; //Discharging
+  }
+  else
+  {
+    return 0; //Charging
+  }
 }
 
 bool Thermal_management()
 {
-	// opens the relay contacts if the temperature is not within the permissible limits
+  // opens the relay contacts if the temperature is not within the permissible limits
   int comm_code = 8;
   int incoming_data = 0;
   int j = 0;
-	bool charge = direction_of_flow_of_current();
-	for (int i = 0; i < series_cells; i++)
-	{
-		if (charge == true)
-		{
-			if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000){
+  bool charge = direction_of_flow_of_current();
+  for (int i = 0; i < series_cells; i++)
+  {
+    if (charge == true)
+    {
+      if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 45.000){
         Serial.println(comm_code);
-        while (!Serial.available()){
+        /*while (!Serial.available()){
         //do nothing
         }
-        incoming_data = Serial.read();
-			  return 1;  //digitalWrite(pinout, HIGH) 
-				//stop the program
-			}
-		  else
-				return 0;//digitalWrite(pinout, LOW)
-		}
-		  else
-		  {
-			  if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000){
+        incoming_data = Serial.read();*/
+        return 1;  //digitalWrite(pinout, HIGH) 
+        //stop the program
+      }
+      else
+        return 0;//digitalWrite(pinout, LOW)
+    }
+      else
+      {
+        if ((temp_sense[i].val_1) <= 0.000 || (temp_sense[i].val_1) >= 55.000){
           Serial.println(comm_code);
-          while (!Serial.available()){
+          /*while (!Serial.available()){
           //do nothing
           }   
-          incoming_data = Serial.read();
-				  return 1; // digitalWrite(pinout, HIGH)
-				  //stop the program
-			  }
-		    else
-				  return 0;  //digitalWrite(pinout, LOW)
-	    }
-	 }
+          incoming_data = Serial.read();*/
+          return 1; // digitalWrite(pinout, HIGH)
+          //stop the program
+        }
+        else
+          return 0;  //digitalWrite(pinout, LOW)
+      }
+   }
 }
 
 /*A 5V relay module is used                                                         
@@ -237,19 +238,19 @@ bool Thermal_management()
  */
 bool over_current()
 {
-	//Over Current protection
+  //Over Current protection
   int comm_code = 9;
   int incoming_data = 0;
   float cellcurrent = abs(total_current_sensing());
   int relayPin = 22; //78;
   if (cellcurrent > 3.000){
     Serial.println(comm_code);
-    while (!Serial.available()){
+    /*while (!Serial.available()){
     //do nothing
     }   
-    incoming_data = Serial.read();
+    incoming_data = Serial.read();*/
     return 1;
-	  //stop the program
+    //stop the program
   }
   return 0;
 }
@@ -263,12 +264,12 @@ bool voltage_protection()
     for(int i=0;i<series_cells;i++){
       if (voltages[i].val_1 > 4.20){ //over voltage protection
         Serial.println(comm_code_over_voltage_protection);
-        while (!Serial.available()){
+        /*while (!Serial.available()){
         //do nothing
         }   
-        incoming_data = Serial.read();
+        incoming_data = Serial.read();*/
         return 1;
-	      //introduce battery capacity calculation measures
+        //introduce battery capacity calculation measures
         }
      }
   }
@@ -276,10 +277,10 @@ bool voltage_protection()
     for(int i=0; i<series_cells; i++){
       if(voltages[i].val_1 <= 2.90){ //under voltage protection
         Serial.println(comm_code_under_voltage_protection);
-        while (!Serial.available()){
+        /*while (!Serial.available()){
         //do nothing
         }   
-        incoming_data = Serial.read(); 
+        incoming_data = Serial.read();*/ 
         return 1;      
       }    
     }
@@ -321,18 +322,18 @@ bool cell_balancing()
   
   if ((voltages[0].val_1) == (voltages[1].val_1) && (voltages[1].val_1) == (voltages[2].val_1)) {
     Serial.println(comm_code_balance_off); //cell balancing offgoing
-    while (!Serial.available()){
+    /*while (!Serial.available()){
     //do nothing
     }   
-    incoming_data = Serial.read();
+    incoming_data = Serial.read();*/
     return true;  // do nothing
   }
   else {
     Serial.println(comm_code_balance_on); //cell balancing ongoing
-    while (!Serial.available()){
+    /*while (!Serial.available()){
     //do nothing
     }   
-    incoming_data = Serial.read();
+    incoming_data = Serial.read();*/
     if ((voltages[0].val_1) >= (voltages[1].val_1)) {
      if ((voltages[1].val_1) >= (voltages[2].val_1)) {
       //3rd cell SOC is the smallest
@@ -376,16 +377,16 @@ select_line_pins.push_back(26);
 select_line_pins.push_back(27);
 select_line_pins.push_back(28);
 
-	for (auto i = 0; i < select_line_pins.size(); i++)
-	{
-		pinMode(select_line_pins[i], OUTPUT);
-		turnOff(select_line_pins[i]);  //digitalWrite(select_line_pins[i]
-	}
+  for (auto i = 0; i < select_line_pins.size(); i++)
+  {
+    pinMode(select_line_pins[i], OUTPUT);
+    turnOff(select_line_pins[i]);  //digitalWrite(select_line_pins[i]
+  }
 
   current_sense[6].val_1 = 0.0;
   
-	pinMode(current_function_output, INPUT);
-	pinMode(temp_function_output, INPUT);
+  pinMode(current_function_output, INPUT);
+  pinMode(temp_function_output, INPUT);
   pinMode(A9, INPUT);
   pinMode(A3, INPUT);
   pinMode(A0, INPUT);
@@ -417,12 +418,12 @@ select_line_pins.push_back(28);
   TCCR0B |= myReqtimer;
 
   delay(1000);
-  while (!Serial.available()){
+  /*while (!Serial.available()){
       //do nothing
       digitalWrite(LED_BUILTIN, HIGH);
       digitalWrite(LED_BUILTIN, LOW);
   }
-  int begin_program = Serial.read();
+  int begin_program = Serial.read();*/
   digitalWrite(LED_BUILTIN, LOW);
 }
 
@@ -433,23 +434,23 @@ void loop()
   current_sense.clear();
   temp_sense.clear();
   voltages.clear();
-	// put your main code here, to run repeatedly:
-	voltage_sensing();
-	total_voltage_sensing();
+  // put your main code here, to run repeatedly:
+  voltage_sensing();
+  total_voltage_sensing();
   current_sensing();
   total_current_sensing();
   Temperature_sense();
   
-	if (voltage_protection()){
+  if (voltage_protection()){
     turnOn(relayPin);
-	}
+  }
   else if(Thermal_management()){
     turnOn(relayPin);
   }
-	else if(over_current()){
+  else if(over_current()){
     turnOn(relayPin);
     delay(60000);
-	}
+  }
   else{
     turnOff(relayPin);
   }
