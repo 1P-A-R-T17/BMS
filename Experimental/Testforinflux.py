@@ -1,4 +1,3 @@
-import random
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -8,7 +7,7 @@ import time
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-token = "teXoimWzBPEly43ay2Gp8F3NosQjw6QZPrd_NF-e8Kl5GaeGd_QwerxsuGoDSO5hCeJZtEFystHJCW2t8Qt1Xg=="
+token = "USHzEz-rXEbNn7h4lkuDAKYump1pVzoLyG0WNkki_rmVGXvdAPYV5_mhNS1hhcwYywJbeGZ1jM5ebU-1vK2JyA=="
 org = "1-PART-17"
 bucket = "Battery Management"
 
@@ -28,14 +27,14 @@ totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 CSV_COLUMN_NAMES = ['Current', 'Temperature', 'Voltage', 'SoC']
-df = pd.read_csv('C:\\Users\\rachi\\Desktop\\NeuralNetwok\\BMS_NN_dataset.csv', names = CSV_COLUMN_NAMES, header = 0)
+df = pd.read_csv('C:\\Users\\Abhishek\\OneDrive\\Desktop\\BMS_NN_dataset.csv', names = CSV_COLUMN_NAMES, header = 0)
 #df.loc[:, 'Temperature'] = 25
 current = df.pop('Current')
 temperature = df.pop('Temperature')
 voltage = df.pop('Voltage')
 soc = df.pop('SoC')
 
-model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
+model = keras.models.load_model('D:\\Battery Management System\\Code\\BMS\\NeuralNetwok\\soc_predictor.h5')
 
 def predict_soc():
     for j in range(9):
@@ -112,17 +111,55 @@ for i in range(1000):
         
         write_api.write(bucket, org, point)
     
-    charge = random.randint(0, 1)
-    if charge == 1:
-        Error_code = Point("Battery_error") \
-            .field("charging", 1)\
+    
+    Error_code = Point("Battery_error") \
+        .field("over_voltage", 1)\
+    
+    write_api.write(bucket, org, Error_code)
+    tic = time.perf_counter()
+    flag=1
+    
+    
+    Error_code = Point("Battery_error")\
+        .field("under_voltage", 1) \
         
-        write_api.write(bucket, org, Error_code)
-    else:
-        Error_code = Point("Battery_error") \
-            .field("discharging", 1)\
+    write_api.write(bucket, org, Error_code)
+    
+    
+    Error_code = Point("Battery_error")\
+        .field("Temperature_error", 1) \
+                 
+    write_api.write(bucket, org, Error_code)
+
+
+    Error_code = Point("Battery_error") \
+        .field("over_current", 1)\
         
-        write_api.write(bucket, org, Error_code)
+    write_api.write(bucket, org, Error_code)
+        
+    
+    Error_code = Point("Battery_error") \
+        .field("charging", 1)\
+        
+    write_api.write(bucket, org, Error_code)
+
+
+    Error_code = Point("Battery_error") \
+        .field("discharging", 1)\
+        
+    write_api.write(bucket, org, Error_code)
+    
+    
+    Error_code = Point("Battery_error") \
+        .field("Cell Balance ON", 1)\
+        
+    write_api.write(bucket, org, Error_code)
+
+
+    Error_code = Point("Battery_error") \
+        .field("Cell Balance OFF", 1)\
+        
+    write_api.write(bucket, org, Error_code)
     
     tic = time.perf_counter()
     print(tic-toc)
