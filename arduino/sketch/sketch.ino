@@ -1,8 +1,5 @@
-#include <Vector.h>
-#include <Pair.h>
 #include <Arduino.h>
 #include <math.h>
-//#include <ArduinoSTL.h>
 
 //relayPin declaration
 const int relayPin=22;
@@ -32,7 +29,8 @@ float temp_sense[9] =  {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00};
 //working of multiplexer function
 void select_Multiplexer_Pin(byte pin)
 {
-	if (pin > total_cells) return;	// Exit the function if it is out of bound
+	if (pin > total_cells) 
+	  return;	// Exit the function if it is out of bound
 	for (auto i = 0; i < 4; i++)
 	{
 		if (pin &(1 << i))   //shifting the bits to activate the specific select lines
@@ -50,7 +48,7 @@ float total_current_sensing()
   int incoming_data = 0;
   Serial.println(comm_code); 
 	float adcValue = analogRead(adcVoltage_pin);
-	float cellcurrent = (adcValue / 1024.0) *5000;	//converts digital value to mV
+	float cellcurrent = (adcValue / 1024.0) *5000.0;	//converts digital value to mV
   float total_current = ((cellcurrent - offsetVoltage) / sensetivity);
   while (!Serial.available()){
      //do nothing
@@ -71,7 +69,7 @@ float total_voltage_sensing()
   int incoming_data = 0;
   Serial.println(comm_code); 
 	int totvolpin = A3; //94
-	float totalVol = (analogRead(totvolpin)) *(5 / 1024);
+	float totalVol = (analogRead(totvolpin)) *(5.00 / 1024.00);
   while (!Serial.available()){
     //do nothing
   }
@@ -113,8 +111,8 @@ So with a +5 volt reference, the digital approximation will be equal to input vo
 
 void current_sensing()
 {
-	float raw_voltage = 0;
-	float voltage = 0;
+	float raw_voltage = 0.0;
+	float voltage = 0.0;
   int comm_code = 3;
   int incoming_data = 0;
   int i = 0;
@@ -124,14 +122,14 @@ void current_sensing()
 		select_Multiplexer_Pin(cur_Pin);
 		delay(5);
 		raw_voltage = (analogRead(current_function_output) / 1024.0) *5000.0;	//converts digital value to mV
-		voltage = ((raw_voltage - offsetVoltage) / sensetivity);	//stores the current sensed in vector
-		current_sense[cur_pin] = voltage;
+		voltage = ((raw_voltage - offsetVoltage) / sensetivity);	//stores the current sensed in array
+		current_sense[cur_Pin] = voltage;
     while (!Serial.available()){
       //do nothing
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.println(current_sense[cur_pin]);
+    Serial.println(current_sense[cur_Pin]);
     delay(1);          
     //}
 	}
@@ -146,13 +144,14 @@ void voltage_sensing()
   Serial.println(comm_code);                             
 	for (int pin = A0; pin< (A0 + series_cells); pin++)//(int pin = 97; pin > 97 - series_cells; pin--)
 	{
-		voltages[pin] = (analogRead(pin) *(5 / 1024));
+		voltages[i] = (analogRead(pin) *(5.00 / 1024.00));
     while (!Serial.available()){
       //do nothing
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.println(voltages[pin]);
+    Serial.println(voltages[i]);
+    i++;
     delay(1);          
     //}
    } 
@@ -174,7 +173,7 @@ void turnOff(int relayPin)
 bool direction_of_flow_of_current()
 {
 	float current = total_current_sensing();
-	if (current > 0.10)
+	if (current > 0.0)
 	{
 		return 1; //Discharging
 	}
@@ -191,9 +190,9 @@ bool Thermal_management()
   int incoming_data = 0;
   int j = 0;
 	bool charge = direction_of_flow_of_current();
-	for (int i = 0; i < series_cells; i++)
+	for (int i = 0; i < total_cells; i++)
 	{
-		if (charge == true)
+		if (charge == true) //Discharging
 		{
 			if ((temp_sense[i]) <= 0.000 || (temp_sense[i]) >= 45.000){
         Serial.println(comm_code);
@@ -207,7 +206,7 @@ bool Thermal_management()
 		  else
 				return 0;//digitalWrite(pinout, LOW)
 		}
-		  else
+		  else   // Charging
 		  {
 			  if ((temp_sense[i]) <= 0.000 || (temp_sense[i]) >= 55.000){
           Serial.println(comm_code);
@@ -235,9 +234,8 @@ bool over_current()
 	//Over Current protection
   int comm_code = 9;
   int incoming_data = 0;
-  float cellcurrent = abs(total_current_sensing());
-  int relayPin = 22; //78;
-  if (cellcurrent > 3.000){
+  float cellcurrent = (total_current_sensing());
+  if (cellcurrent > 1.200 || cellcurrent < -3.000){
     Serial.println(comm_code);
     while (!Serial.available()){
     //do nothing
@@ -262,6 +260,14 @@ bool voltage_protection()
         //do nothing
         }   
         incoming_data = Serial.read();
+        turnOff(31);
+        turnOff(32);
+        turnOff(33);
+        turnOff(34);
+        turnOff(35);
+        turnOff(36);
+        analogWrite (13, 0);
+        analogWrite (4, 0);
         return 1;
 	      //introduce battery capacity calculation measures
         }
@@ -275,6 +281,14 @@ bool voltage_protection()
         //do nothing
         }   
         incoming_data = Serial.read(); 
+        turnOff(31);
+        turnOff(32);
+        turnOff(33);
+        turnOff(34);
+        turnOff(35);
+        turnOff(36);
+        analogWrite (13, 0);
+        analogWrite (4, 0);
         return 1;      
       }    
     }
@@ -282,6 +296,7 @@ bool voltage_protection()
   else{
     return 0; // continue standard ops
   }
+  return 0;
 }
 
 bool cell_balancing()
@@ -311,7 +326,7 @@ bool cell_balancing()
   int incoming_data = 0;
   
   for(int i=0;i<=2;i++){
-    voltages[i]=(round(voltages[i]*1000))/1000.0;
+    voltages[i]=(round(voltages[i]*1000.0))/1000.0;
   }
   
   if ((voltages[0]) == (voltages[1]) && (voltages[1]) == (voltages[2])) {
@@ -331,35 +346,35 @@ bool cell_balancing()
     if ((voltages[0]) >= (voltages[1])) {
      if ((voltages[1]) >= (voltages[2])) {
       //3rd cell SOC is the smallest
-      analogWrite (cell_bal0, 64);
-      analogWrite (cell_bal7, 64);
+      analogWrite (cell_bal0, 75);
+      analogWrite (cell_bal7, 75);
       digitalWrite (cell_bal6, HIGH);
       digitalWrite (cell_bal3, HIGH);
      }
     else {
       //2nd cell SOC is the smallest1
-      analogWrite (cell_bal0, 64);
-      analogWrite (cell_bal7, 64);
+      analogWrite (cell_bal0, 75);
+      analogWrite (cell_bal7, 75);
       digitalWrite (cell_bal5, HIGH);
       digitalWrite (cell_bal2, HIGH);
      }
   }
-   else if ((voltages[1]) >= (voltages[2])) {
+   else if ((voltages[0]) >= (voltages[2])) {
     //3rd cell SOC is the smallest
-    analogWrite (cell_bal0, 64);
-    analogWrite (cell_bal7, 64);
+    analogWrite (cell_bal0, 75);
+    analogWrite (cell_bal7, 75);
     digitalWrite (cell_bal6, HIGH);
     digitalWrite (cell_bal3, HIGH);
    }
-   else if ((voltages[3]) >= (voltages[1])) {
+   else if ((voltages[2]) >= (voltages[0])) {
     //1st cell SOC is the smallest
-    analogWrite (cell_bal0, 64);
-    analogWrite (cell_bal7, 64);
+    analogWrite (cell_bal0, 75);
+    analogWrite (cell_bal7, 75);
     digitalWrite (cell_bal1, HIGH);
     digitalWrite (cell_bal4, HIGH);
    }
-  delay(1);
-}
+
+  }
   return false;
 }
 
@@ -377,7 +392,10 @@ Serial.begin(19200);
 	pinMode(current_function_output, INPUT);
 	pinMode(temp_function_output, INPUT);
   pinMode(A9, INPUT);
+  
   pinMode(A3, INPUT);
+  pinMode(A2, INPUT);
+  pinMode(A1, INPUT);
   pinMode(A0, INPUT);
 
   
@@ -395,10 +413,12 @@ Serial.begin(19200);
   turnOff(35);
   pinMode(36, OUTPUT);
   turnOff(36);
+ 
+  //PWM pins
   pinMode(13, OUTPUT);
-  turnOff(13);
   pinMode(4, OUTPUT);
-  turnOff(4);
+  analogWrite (13, 0);
+  analogWrite (4, 0);
   
  //Control of PWM for Cell Balancing
   int myPretimer = 7;
@@ -429,31 +449,32 @@ void loop()
   
 	if (voltage_protection()){
     turnOn(relayPin);
+    delay(60000);
 	}
   else if(Thermal_management()){
     turnOn(relayPin);
   }
 	else if(over_current()){
     turnOn(relayPin);
-    delay(20000);
+    delay(60000);
 	}
   else{
     turnOff(relayPin);
   }
   
-  charge = direction_of_flow_of_current();
+  charge = direction_of_flow_of_current(); // 0->charging ||||| 1->discharging
   int comm_code_charge = 10;
   int comm_code_discharge = 11;
-  int incoming_data;
+  int incoming_data = 0;
   if(charge){
-    Serial.println(comm_code_charge);
+    Serial.println(comm_code_discharge);
     while (!Serial.available()){
      //do nothing
     }
     incoming_data = Serial.read();
   }
   else{
-    Serial.println(comm_code_discharge);
+    Serial.println(comm_code_charge);
     while (!Serial.available()){
      //do nothing
     }
