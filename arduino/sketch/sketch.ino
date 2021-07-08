@@ -466,7 +466,7 @@ void loop()
   int comm_code_charge = 10;
   int comm_code_discharge = 11;
   int incoming_data = 0;
-  if(charge){
+  if(charge){ 
     Serial.println(comm_code_discharge);
     while (!Serial.available()){
      //do nothing
