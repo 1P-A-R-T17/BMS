@@ -69,7 +69,7 @@ float total_voltage_sensing()
   int incoming_data = 0;
   Serial.println(comm_code); 
 	int totvolpin = A3; //94
-	float totalVol = (analogRead(totvolpin)) *(5.00 / 1024.00);
+	float totalVol = analogRead(totvolpin) *(5.00 / 1024.00) * 4.7951807;
   while (!Serial.available()){
     //do nothing
   }
@@ -144,7 +144,7 @@ void voltage_sensing()
   Serial.println(comm_code);                             
 	for (int pin = A0; pin< (A0 + series_cells); pin++)//(int pin = 97; pin > 97 - series_cells; pin--)
 	{
-		voltages[i] = (analogRead(pin) *(5.00 / 1024.00));
+		voltages[i] = (analogRead(pin) *(5.00 / 1024.00) * 4.7951807);
     while (!Serial.available()){
       //do nothing
     }
