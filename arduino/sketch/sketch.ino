@@ -21,7 +21,7 @@ float current_sense[9] =  {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00};
 
 
 const float sensetivity = 185.00;	//As per datasheet of ACS712 for range of 5A
-const float offsetVoltage = 2500.00;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
+const float offsetVoltage = 2365.00;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
 
 //Variables for Temperature sensing
 float temp_sense[3] = {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00};
@@ -49,8 +49,8 @@ float total_current_sensing()
   int incoming_data = 0;
   Serial.println(comm_code); 
 	float adcValue = analogRead(adcVoltage_pin);
-	float cellcurrent = (adcValue / 1024.0) *4.73;	//converts digital value to mV
-  float total_current = ((cellcurrent - offsetVoltage) / sensetivity);
+	float cellcurrent = (adcValue / 1023.0) *4730;	//converts digital value to mV
+  float total_current = ((cellcurrent - offsetVoltage) / (sensetivity));
   while (!Serial.available()){
      //do nothing
    }
@@ -59,6 +59,7 @@ float total_current_sensing()
   Serial.println(total_current);          
   //}
   delay(1);
+  total_current = 0.0;
 	return total_current;	//returns the current sensed
   
 }
@@ -121,8 +122,8 @@ void current_sensing()
 	{
 		select_Multiplexer_Pin(cur_Pin);
 		delay(5);
-		raw_voltage = (analogRead(current_function_output) / 1024.0) *4.73;	//converts digital value to mV
-		voltage = ((raw_voltage - offsetVoltage) / sensetivity);	//stores the current sensed in array
+		raw_voltage = (analogRead(current_function_output) / 1023.0) *4730;	//converts digital value to mV
+		voltage = ((raw_voltage - offsetVoltage) / (sensetivity));	//stores the current sensed in array
 		current_sense[cur_Pin] = voltage;
     while (!Serial.available()){
       //do nothing
@@ -130,6 +131,7 @@ void current_sensing()
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
     Serial.println(current_sense[cur_Pin]);
+    voltage = 0.0;
     delay(1);          
     //}
 	}
