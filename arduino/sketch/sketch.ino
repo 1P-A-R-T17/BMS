@@ -24,7 +24,7 @@ const float sensetivity = 185.00;	//As per datasheet of ACS712 for range of 5A
 const float offsetVoltage = 2500.00;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
 
 //Variables for Temperature sensing
-float temp_sense[9] =  {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00};
+float temp_sense[9] =  {0.00,0.00,0.00};
 
 //working of multiplexer function
 void select_Multiplexer_Pin(byte pin)
@@ -83,31 +83,32 @@ float total_voltage_sensing()
 
 void Temperature_sense()
 {
-  int i = 0;
+  float temp = 0.0;
   int comm_code = 5;
   int incoming_data = 0;
+  float average = 0.00;
   Serial.println(comm_code); 
-	for (int tempPin = 0; tempPin < total_cells; tempPin++)
+	for (int tempPin = 0; tempPin <parallel_cells; tempPin++)
   {
 	  select_Multiplexer_Pin(tempPin);
 	  delay(5);
-	  temp_sense[tempPin] = (analogRead(temp_function_output) *0.48828125);
+	  temp = (analogRead(temp_function_output) *4.73)/1023.0;
+    temp_sense[tempPin] = (temp*10.00);
+    temp = 0.0; 
+    average = average + temp_sense[tempPin]; 
+  }
+   average = average/3.00; 
     while (!Serial.available()){
       //do nothing
     }
     incoming_data = Serial.read();   
     //if(incoming_data == comm_code){
-    Serial.println(temp_sense[tempPin]);
-    delay(1);          
+    Serial.println(average);
+    delay(1);
+           
     //}
-  }	// convert the analog volt to its temperature equivalent  
-}	// for LM35 IC we have to multiply temperature with 0.48828125
-/*LM35 sensor has three terminals - Vs, Vout and GND. We will connect the sensor as follows −
-Connect the +Vs to +5v on your Arduino board.
-Connect Vout to Analog0 or A0 on Arduino board.
-Connect GND with GND on Arduino.
-The Analog to Digital Converter (ADC) converts analog values into a digital approximation based on the formula ADC Value = sample *1024 / reference voltage (+5v).
-So with a +5 volt reference, the digital approximation will be equal to input voltage *205.   */
+  	  
+}	
 
 void current_sensing()
 {
