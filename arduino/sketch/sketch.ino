@@ -48,7 +48,7 @@ float total_current_sensing()
   int incoming_data = 0;
   Serial.println(comm_code); 
 	float adcValue = analogRead(adcVoltage_pin);
-	float cellcurrent = (adcValue / 1024.0) *5000.0;	//converts digital value to mV
+	float cellcurrent = (adcValue / 1024.0) *4.73;	//converts digital value to mV
   float total_current = ((cellcurrent - offsetVoltage) / sensetivity);
   while (!Serial.available()){
      //do nothing
@@ -121,7 +121,7 @@ void current_sensing()
 	{
 		select_Multiplexer_Pin(cur_Pin);
 		delay(5);
-		raw_voltage = (analogRead(current_function_output) / 1024.0) *5000.0;	//converts digital value to mV
+		raw_voltage = (analogRead(current_function_output) / 1024.0) *4.73;	//converts digital value to mV
 		voltage = ((raw_voltage - offsetVoltage) / sensetivity);	//stores the current sensed in array
 		current_sense[cur_Pin] = voltage;
     while (!Serial.available()){
