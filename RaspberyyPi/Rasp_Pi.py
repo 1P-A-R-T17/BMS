@@ -30,7 +30,7 @@ flag=0
 
 parallel_v = [0.0, 0.0, 0.0]
 cur_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-temp_cell = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+temp_cell = 0.00
 totv = 0
 totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -52,7 +52,7 @@ def predict_soc():
         else:
             x=2
         
-        soc[i] = model.predict([[cur_cell[i], temp_cell[i], parallel_v[x]]])
+        soc[i] = model.predict([[cur_cell[i], temp_cell, parallel_v[x]]])
         string = 'state of charge ' + str(i)
         point  = Point("Battery") \
             .tag("Type", "State of charge") \
@@ -104,16 +104,14 @@ def read_totalamps():
     write_api.write(bucket, org, point)
     
 def read_temperature():
-    for i in range(totalcell):
-        ser.write(return_code)
-        temp_cell[i] = float(ser.readline())
-        string = 'temperature' + str(i)
-        point = Point("Battery") \
-            .tag("Type","temperature") \
-            .field(string, temp_cell[i]) \
+    ser.write(return_code)
+    temp_cell = float(ser.readline())
+    point = Point("Battery") \
+        .tag("Type","temperature") \
+        .field("average_temperature", temp_cell) \
                 
-        write_api.write(bucket, org, point)
-        predict_soc()
+    write_api.write(bucket, org, point)
+    predict_soc()
 
 def soh_calculation(totv):
     #Battery capacity calculation
