@@ -24,7 +24,8 @@ const float sensetivity = 185.00;	//As per datasheet of ACS712 for range of 5A
 const float offsetVoltage = 2500.00;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
 
 //Variables for Temperature sensing
-float temp_sense[9] =  {0.00,0.00,0.00};
+float temp_sense[3] =  {0.00,0.00,0.00};
+float average = 0.00;
 
 //working of multiplexer function
 void select_Multiplexer_Pin(byte pin)
@@ -86,7 +87,6 @@ void Temperature_sense()
   float temp = 0.0;
   int comm_code = 5;
   int incoming_data = 0;
-  float average = 0.00;
   Serial.println(comm_code); 
 	for (int tempPin = 0; tempPin <parallel_cells; tempPin++)
   {
@@ -191,11 +191,11 @@ bool Thermal_management()
   int incoming_data = 0;
   int j = 0;
 	bool charge = direction_of_flow_of_current();
-	for (int i = 0; i < total_cells; i++)
+	for (int i = 0; i < parallel_cells; i++)
 	{
 		if (charge == true) //Discharging
 		{
-			if ((temp_sense[i]) <= 0.000 || (temp_sense[i]) >= 45.000){
+			if (average <= 0.000 || average >= 45.000){
         Serial.println(comm_code);
         while (!Serial.available()){
         //do nothing
@@ -209,7 +209,7 @@ bool Thermal_management()
 		}
 		  else   // Charging
 		  {
-			  if ((temp_sense[i]) <= 0.000 || (temp_sense[i]) >= 55.000){
+			  if (average <= 0.000 || average >= 55.000){
           Serial.println(comm_code);
           while (!Serial.available()){
           //do nothing
