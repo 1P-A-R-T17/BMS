@@ -24,7 +24,7 @@ const float sensetivity = 185.00;	//As per datasheet of ACS712 for range of 5A
 const float offsetVoltage = 2365.00;	//(mV) Offset Voltage is Vcc/2. Assuming 5V supply is given through Arduino board.
 
 //Variables for Temperature sensing
-float temp_sense[3] = {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00};
+float temp_sense[9] = {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00};
 float average = 0.00;
 
 //working of multiplexer function
