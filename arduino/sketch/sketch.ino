@@ -5,8 +5,8 @@
 const int relayPin=22;
 
 //select line multiplexer variables
-int select_line_pins[4] = {25, 26, 27, 28};       //{ 75, 74, 73, 72 }
-
+int select_line_pins[4] = {25, 26, 27, 28};       //{ 75, 74, 73, 72 }             
+// 25 is the LSB and 28 is the MSB
 const int current_function_output = A8;	//Pin number(89) for current sensing
 const int temp_function_output = A13;	//Pin number(84) for temperature sensing
 
@@ -32,7 +32,7 @@ void select_Multiplexer_Pin(byte pin)
 {
 	if (pin > total_cells) 
 	  return;	// Exit the function if it is out of bound
-	for (auto i = 0; i < 4; i++)
+	for (auto i = 0; i < 4; i++)     //for each element of the select_line_pins array ,loop runs 4 times.
 	{
 		if (pin &(1 << i))   //shifting the bits to activate the specific select lines
 			turnOn(select_line_pins[i]);  //digitalWrite(select_line_pins[i], HIGH)
