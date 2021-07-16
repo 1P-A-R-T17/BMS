@@ -52,7 +52,7 @@ def predict_soc():
         else:
             x=2
         
-        soc[i] = model.predict([[cur_cell[i], temp_cell, parallel_v[x]]])
+        soc[i] = model.predict([[abs(cur_cell[i]), temp_cell, parallel_v[x]]])
         string = 'state of charge ' + str(i)
         point  = Point("Battery") \
             .tag("Type", "State of charge") \

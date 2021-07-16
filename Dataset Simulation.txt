@@ -24,30 +24,26 @@ fin.open("new_BMS.txt"); // Open in text-mode.
     // Read the file and load the data:
      cout<<"time"<<", "<<"current"<<", "<<"temp"<<", "<<"ocv"<<", "<<"soc"<<endl;
 
-
-
-
-
  fin<<"time"<<","<<"current"<<","<<"temperature"<<","<<"ocv"<<","<<"soc"<<endl;
 
 for(float temp=10;temp<=40;temp+=5){
         initial_soc=1;
 for(float current=0.00;current<=1.250;current+=0.0001){
-        kt=-0.00005063*(temp*temp)+0.00518*temp+0.904;
-        ki=-0.007571*(current*current*current)+0.000000009897*(current*current)-0.00004198*current+1.035;
-        ka=-0.000000000001225*(a*a*a*a)+0.000000002726*(a*a*a)-0.000001980*(a*a)+0.0003610*a+0.942;
+        kt=-0.00005063*(temp*temp)+0.00518*temp+0.904;    // temperature constant values are calculated for each temperature.
+        ki=-0.007571*(current*current*current)+0.000000009897*(current*current)-0.00004198*current+1.035;  // Current dependant constants are calculated for each current reading
+        ka=-0.000000000001225*(a*a*a*a)+0.000000002726*(a*a*a)-0.000001980*(a*a)+0.0003610*a+0.942;    //Aging factor is calculated 
        //cout<<i<<", ";
         i++;
        // cout<<current<<", ";
         //cout<<temp<<", ";
 
-        initial_soc=initial_soc-((current*0.000277820)/(kt*ki*ka*nominal_capacity));
-        terminal_voltage=3.14429999 +(1.050999999*initial_soc);
+        initial_soc=initial_soc-((current*0.000277820)/(kt*ki*ka*nominal_capacity));     //Kalman filter algorithm logic is been implemented
+        terminal_voltage=3.14429999 +(1.050999999*initial_soc);       //Relation between terminal voltage and SOC
      //   cout<<open_circuit_voltage<<", ";
 
         //cout<<initial_soc<<endl;
 
-        fin << current << "," << temp <<"," << open_circuit_voltage << "," <<initial_soc<<endl;
+        fin << current << "," << temp <<"," << open_circuit_voltage << "," <<initial_soc<<endl;       //writing into the file using fstream
 
 }
 cout<<"--------------------------------------------------------------------"<<endl;
