@@ -82,9 +82,10 @@ def read_totalvolts():
         .tag("Type", "Voltage") \
         .field("Total Voltage", totv) \
         #.time(datetime.utcnow(), WritePrecision.NS)
-        print("Total Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
+        
 
     write_api.write(bucket, org, point)
+    print("Total Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
     
 def read_cellamps():
     for i in range(totalcell):
@@ -194,7 +195,7 @@ while True:
             .field("discharging", 1)\
         
         write_api.write(bucket, org, Error_code)
-         print("Discharging status deployed to Grafana dashboard",end = "**")
+        print("Discharging status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 12:
         #inform cell balance on
@@ -202,7 +203,7 @@ while True:
             .field("Cell Balance ON", 1)\
         
         write_api.write(bucket, org, Error_code)
-         print("CeLL balancing ON status deployed to Grafana dashboard",end = "**")
+        print("Cell balancing ON status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 13:
         #inform cell balance off
@@ -210,7 +211,7 @@ while True:
             .field("Cell Balance OFF", 1)\
         
         write_api.write(bucket, org, Error_code)
-        print("CeLL balancing OFF status deployed to Grafana dashboard",end = "**")
+        print("Cell balancing OFF status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
         
 
