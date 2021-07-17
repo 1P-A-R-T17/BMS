@@ -35,6 +35,26 @@ totv = 0
 totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
+Error_code = Point("Battery_error") \
+    .field("over_voltage", 0)\
+        
+write_api.write(bucket, org, Error_code)
+
+Error_code = Point("Battery_error")\
+    .field("under_voltage", 0) \
+        
+write_api.write(bucket, org, Error_code)
+
+Error_code = Point("Battery_error")\
+    .field("Temperature_error", 0) \
+                 
+write_api.write(bucket, org, Error_code)
+
+Error_code = Point("Battery_error") \
+    .field("over_current", 0)\
+        
+write_api.write(bucket, org, Error_code)
+
 model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
 
 return_code = 1
@@ -87,6 +107,8 @@ def read_totalvolts():
         
 
     write_api.write(bucket, org, point)
+    
+    print("Total voltage is scanned  and deployed to Grafana dashboard",end = "**")
     
     
 def read_cellamps():
@@ -190,10 +212,18 @@ while True:
             .field("charging", 1)\
         
         write_api.write(bucket, org, Error_code)
+        Error_code = Point("Battery_error") \
+            .field("discharging", 0)\
+        
+        write_api.write(bucket, org, Error_code)
         print("Charging status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 11:
         #inform influxdb of discharging
+        Error_code = Point("Battery_error") \
+            .field("charging", 0)\
+        
+        write_api.write(bucket, org, Error_code)
         Error_code = Point("Battery_error") \
             .field("discharging", 1)\
         
@@ -206,10 +236,18 @@ while True:
             .field("Cell Balance ON", 1)\
         
         write_api.write(bucket, org, Error_code)
+        Error_code = Point("Battery_error") \
+            .field("Cell Balance OFF", 0)\
+        
+        write_api.write(bucket, org, Error_code)
         print("Cell balancing ON status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 13:
         #inform cell balance off
+        Error_code = Point("Battery_error") \
+            .field("Cell Balance ON", 0)\
+        
+        write_api.write(bucket, org, Error_code)
         Error_code = Point("Battery_error") \
             .field("Cell Balance OFF", 1)\
         

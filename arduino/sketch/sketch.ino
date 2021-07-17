@@ -43,13 +43,14 @@ void select_Multiplexer_Pin(byte pin)
 float total_current_sensing() 
 {
   // senses the overall current of the battery pack
+  float total_current = 0.0;
   int adcVoltage_pin = A9; //88
   int comm_code = 4;
   int incoming_data = 0;
   Serial.println(comm_code);
   float adcValue = analogRead(adcVoltage_pin);
   float cellcurrent = (adcValue / 1023.0) * 4730; //converts digital value to mV
-  float total_current = ((cellcurrent - offsetVoltage) / (sensetivity));
+  total_current = ((cellcurrent - offsetVoltage) / (sensetivity));
   while (!Serial.available()) 
   {
     //do nothing
@@ -59,7 +60,6 @@ float total_current_sensing()
   Serial.println(total_current);
   //}
   delay(1);
-  total_current = 0.0;
   return total_current; //returns the current sensed
 
 }
@@ -98,6 +98,7 @@ void Temperature_sense()
     temp_sense[tempPin] = (temp * 10.00);
     temp = 0.0;
     average = average + temp_sense[tempPin];
+    delay(1);
   }
   average = average / 9.00;
   while (!Serial.available()) 
@@ -107,8 +108,6 @@ void Temperature_sense()
   incoming_data = Serial.read();
   //if(incoming_data == comm_code){
   Serial.println(average);
-  delay(1);
-
 }
 
 void current_sensing() 
@@ -117,7 +116,6 @@ void current_sensing()
   float voltage = 0.0;
   int comm_code = 3;
   int incoming_data = 0;
-  int i = 0;
   Serial.println(comm_code);
   for (int cur_Pin = 0; cur_Pin < total_cells; cur_Pin++) 
   {
@@ -146,7 +144,7 @@ void voltage_sensing()
   int comm_code = 1;
   int incoming_data = 0;
   Serial.println(comm_code);
-  for (int pin = A0; pin < (A0 + series_cells); pin++) //(int pin = 97; pin > 97 - series_cells; pin--)
+  for (int pin = A0; pin < A3; pin++) //(int pin = 97; pin > 97 - series_cells; pin--)
   {
     voltages[i] = (analogRead(pin) * (5.00 / 1024.00) * 4.7951807);
     while (!Serial.available()) 
@@ -231,12 +229,11 @@ bool Thermal_management()
     5V Vcc: Connects the Arduino’s 5V pin
     Signal: Carries the trigger signal from the Arduino that activates the relay
  */
-bool over_current() 
+bool over_current(float cellcurrent) 
 {
   //Over Current protection
   int comm_code = 9;
   int incoming_data = 0;
-  float cellcurrent = (total_current_sensing());
   if (cellcurrent > 1.200 || cellcurrent < -3.000) 
   {
     Serial.println(comm_code);
@@ -315,14 +312,14 @@ bool voltage_protection()
 bool cell_balancing() 
 {
   //cell balancing
-  int cell_bal0 = 13;
-  int cell_bal1 = 31;
-  int cell_bal2 = 32;
-  int cell_bal3 = 33;
-  int cell_bal4 = 34;
-  int cell_bal5 = 35;
-  int cell_bal6 = 36;
-  int cell_bal7 = 4;
+  int cell_bal0 = 13; //MOSFET A
+  int cell_bal1 = 31; //MOSFET B
+  int cell_bal2 = 32; //MOSFET C
+  int cell_bal3 = 33; //MOSFET D
+  int cell_bal4 = 34; //MOSFET E
+  int cell_bal5 = 35; //MOSFET F
+  int cell_bal6 = 36; //MOSFET G
+  int cell_bal7 = 4; //MOSFET H
 
   turnOff(cell_bal1);
   turnOff(cell_bal2);
@@ -365,7 +362,7 @@ bool cell_balancing()
     {
       if ((voltages[1]) >= (voltages[2])) 
       {
-        //3rd cell SOC is the smallest
+        //3rd cell Voltage is the smallest
         analogWrite(cell_bal0, 76); //Duty cycle = 0.3 * 255 = 76.5
         analogWrite(cell_bal7, 76);
         digitalWrite(cell_bal6, HIGH);
@@ -373,7 +370,7 @@ bool cell_balancing()
       } 
       else 
       {
-        //2nd cell SOC is the smallest1
+        //2nd cell Voltage is the smallest1
         analogWrite(cell_bal0, 76);
         analogWrite(cell_bal7, 76);
         digitalWrite(cell_bal5, HIGH);
@@ -382,7 +379,7 @@ bool cell_balancing()
     } 
     else if ((voltages[0]) >= (voltages[2])) 
     {
-      //3rd cell SOC is the smallest
+      //3rd cell Voltage is the smallest
       analogWrite(cell_bal0, 76);
       analogWrite(cell_bal7, 76);
       digitalWrite(cell_bal6, HIGH);
@@ -390,7 +387,7 @@ bool cell_balancing()
     } 
     else if ((voltages[2]) >= (voltages[0])) 
     {
-      //1st cell SOC is the smallest
+      //1st cell Voltage is the smallest
       analogWrite(cell_bal0, 76);
       analogWrite(cell_bal7, 76);
       digitalWrite(cell_bal1, HIGH);
@@ -468,7 +465,7 @@ void loop()
   voltage_sensing();
   total_voltage_sensing();
   current_sensing();
-  total_current_sensing();
+  float cellcurrent = total_current_sensing();
   Temperature_sense();
 
   if (voltage_protection()) 
@@ -480,7 +477,7 @@ void loop()
   {
     turnOff(relayPin);
   } 
-  else if (over_current()) 
+  else if (over_current(cellcurrent)) 
   {
     turnOff(relayPin);
     delay(60000);
