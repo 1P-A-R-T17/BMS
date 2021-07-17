@@ -59,7 +59,8 @@ def predict_soc():
             .field(string, soc[i]) \
     
         write_api.write(bucket, org, point)
-        print("SOC prediction is calculated and deployed to Grafana dashboard",end = "**")
+        
+    print("SOC prediction is calculated and deployed to Grafana dashboard",end = "**")
     
 
 def read_cellvolts():
@@ -73,7 +74,8 @@ def read_cellvolts():
             #.time(datetime.utcnow(), WritePrecision.NS)
 
         write_api.write(bucket, org, point)
-        print("Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
+        
+    print("Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
 
 def read_totalvolts():
     ser.write(return_code)
@@ -85,7 +87,7 @@ def read_totalvolts():
         
 
     write_api.write(bucket, org, point)
-    print("Total Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
+    
     
 def read_cellamps():
     for i in range(totalcell):
@@ -97,7 +99,8 @@ def read_cellamps():
             .field(string, cur_cell[i]) \
                 
         write_api.write(bucket, org, point) 
-        print("Cell current is scanned  and deployed to Grafana dashboard",end = "**")
+        
+    print("Cell current is scanned  and deployed to Grafana dashboard",end = "**")
         
 def read_totalamps():
     ser.write(return_code)
