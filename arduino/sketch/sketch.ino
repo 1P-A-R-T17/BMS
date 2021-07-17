@@ -366,16 +366,16 @@ bool cell_balancing()
       if ((voltages[1]) >= (voltages[2])) 
       {
         //3rd cell SOC is the smallest
-        analogWrite(cell_bal0, 75);
-        analogWrite(cell_bal7, 75);
+        analogWrite(cell_bal0, 76); //Duty cycle = 0.3 * 255 = 76.5
+        analogWrite(cell_bal7, 76);
         digitalWrite(cell_bal6, HIGH);
         digitalWrite(cell_bal3, HIGH);
       } 
       else 
       {
         //2nd cell SOC is the smallest1
-        analogWrite(cell_bal0, 75);
-        analogWrite(cell_bal7, 75);
+        analogWrite(cell_bal0, 76);
+        analogWrite(cell_bal7, 76);
         digitalWrite(cell_bal5, HIGH);
         digitalWrite(cell_bal2, HIGH);
       }
@@ -383,16 +383,16 @@ bool cell_balancing()
     else if ((voltages[0]) >= (voltages[2])) 
     {
       //3rd cell SOC is the smallest
-      analogWrite(cell_bal0, 75);
-      analogWrite(cell_bal7, 75);
+      analogWrite(cell_bal0, 76);
+      analogWrite(cell_bal7, 76);
       digitalWrite(cell_bal6, HIGH);
       digitalWrite(cell_bal3, HIGH);
     } 
     else if ((voltages[2]) >= (voltages[0])) 
     {
       //1st cell SOC is the smallest
-      analogWrite(cell_bal0, 75);
-      analogWrite(cell_bal7, 75);
+      analogWrite(cell_bal0, 76);
+      analogWrite(cell_bal7, 76);
       digitalWrite(cell_bal1, HIGH);
       digitalWrite(cell_bal4, HIGH);
     }
@@ -442,6 +442,7 @@ void setup()
   analogWrite(4, 0);
 
   //Control of PWM for Cell Balancing
+  //PWM frequency = 250Hz
   int myPretimer = 7;
   TCCR0B &= ~myPretimer;
   int myReqtimer = 4;
