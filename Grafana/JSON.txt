@@ -42,3 +42,12 @@ from(bucket: "Battery Management")
   |> filter(fn: (r) => r["_field"] == "current0" or r["_field"] == "current1" or r["_field"] == "current2" or r["_field"] == "current3" or r["_field"] == "current4" or r["_field"] == "current5" or r["_field"] == "current6" or r["_field"] == "current7" or r["_field"] == "current8")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
   |> yield(name: "mean")
+
+
+from(bucket: "Battery Management")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "Battery")
+  |> filter(fn: (r) => r["Type"] == "State of charge")
+  |> filter(fn: (r) => r["_field"] == "state of charge 0" or r["_field"] == "state of charge 1" or r["_field"] == "state of charge 2" or r["_field"] == "state of charge 3" or r["_field"] == "state of charge 4" or r["_field"] == "state of charge 5" or r["_field"] == "state of charge 6" or r["_field"] == "state of charge 7" or r["_field"] == "state of charge 8")
+  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
+  |> yield(name: "mean")
