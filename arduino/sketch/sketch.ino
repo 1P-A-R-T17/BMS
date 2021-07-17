@@ -456,6 +456,7 @@ void setup()
   }
   int begin_program = Serial.read();
   digitalWrite(LED_BUILTIN, LOW);
+  turnOn(relayPin);
 }
 
 void loop() 
@@ -471,21 +472,21 @@ void loop()
 
   if (voltage_protection()) 
   {
-    turnOn(relayPin);
+    turnOff(relayPin);
     delay(60000);
   } 
   else if (Thermal_management()) 
   {
-    turnOn(relayPin);
+    turnOff(relayPin);
   } 
   else if (over_current()) 
   {
-    turnOn(relayPin);
+    turnOff(relayPin);
     delay(60000);
   } 
   else 
   {
-    turnOff(relayPin);
+    turnOn(relayPin);
   }
 
   charge = direction_of_flow_of_current(); // 0->charging ||||| 1->discharging

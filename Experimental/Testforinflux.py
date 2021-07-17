@@ -149,13 +149,13 @@ for i in range(1000):
     
     
     Error_code = Point("Battery_error") \
-        .field("Cell Balance ON", 0)\
+        .field("Cell Balance ON", 1)\
         
     write_api.write(bucket, org, Error_code)
 
 
     Error_code = Point("Battery_error") \
-        .field("Cell Balance OFF", 1)\
+        .field("Cell Balance OFF", 0)\
         
     write_api.write(bucket, org, Error_code)
     
