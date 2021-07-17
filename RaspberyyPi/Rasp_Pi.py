@@ -59,6 +59,7 @@ def predict_soc():
             .field(string, soc[i]) \
     
         write_api.write(bucket, org, point)
+        print("SOC prediction is calculated and deployed to Grafana dashboard",end = "**")
     
 
 def read_cellvolts():
@@ -72,6 +73,7 @@ def read_cellvolts():
             #.time(datetime.utcnow(), WritePrecision.NS)
 
         write_api.write(bucket, org, point)
+        print("Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
 
 def read_totalvolts():
     ser.write(return_code)
@@ -80,6 +82,7 @@ def read_totalvolts():
         .tag("Type", "Voltage") \
         .field("Total Voltage", totv) \
         #.time(datetime.utcnow(), WritePrecision.NS)
+        print("Total Cell voltage is scanned  and deployed to Grafana dashboard",end = "**")
 
     write_api.write(bucket, org, point)
     
@@ -92,7 +95,8 @@ def read_cellamps():
             .tag("Type","current") \
             .field(string, cur_cell[i]) \
                 
-        write_api.write(bucket, org, point)        
+        write_api.write(bucket, org, point) 
+        print("Cell current is scanned  and deployed to Grafana dashboard",end = "**")
         
 def read_totalamps():
     ser.write(return_code)
@@ -102,6 +106,7 @@ def read_totalamps():
         .field("Total Current", totamp) \
                 
     write_api.write(bucket, org, point)
+    print("Total Cell current is scanned  and deployed to Grafana dashboard",end = "**")
     
 def read_temperature():
     ser.write(return_code)
@@ -111,6 +116,7 @@ def read_temperature():
         .field("average_temperature", temp_cell) \
                 
     write_api.write(bucket, org, point)
+    print("Cell temperature is scanned  and deployed to Grafana dashboard",end = "**")
     predict_soc()
 
 def soh_calculation(totv):
@@ -122,6 +128,7 @@ def soh_calculation(totv):
         .field("SoH", soh)
         
     write_api.write(bucket, org, point)
+    print("SOH is calulated and deployed to Grafana dashboard",end = "**")
     
 while True:
     while ser.in_waiting<=0:
@@ -145,6 +152,7 @@ while True:
             .field("over_voltage", 1)\
         
         write_api.write(bucket, org, Error_code)
+        print("Overvoltage status deployed to Grafana dashboard",end = "**")
         tic = time.perf_counter()
         flag=1
         ser.write(return_code) #write at end of block
@@ -154,6 +162,7 @@ while True:
              .field("under_voltage", 1) \
         
          write_api.write(bucket, org, Error_code)
+         print("Undervoltage status deployed to Grafana dashboard",end = "**")
          ser.write(return_code)
     elif comm_code == 8:
         #inform influxdb of thermal error
@@ -161,6 +170,7 @@ while True:
              .field("Temperature_error", 1) \
                  
          write_api.write(bucket, org, Error_code)
+         print("Thermal status deployed to Grafana dashboard",end = "**")
          ser.write(return_code)
     elif comm_code == 9:
         #inform influxdb of overCurrent
@@ -168,6 +178,7 @@ while True:
             .field("over_current", 1)\
         
         write_api.write(bucket, org, Error_code)
+        print("Overcurrent status deployed to Grafana dashboard",end = "**")
         ser.write(return_code) #write at end of block
     elif comm_code == 10:
         #inform influxdb of charging
@@ -175,6 +186,7 @@ while True:
             .field("charging", 1)\
         
         write_api.write(bucket, org, Error_code)
+        print("Charging status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 11:
         #inform influxdb of discharging
@@ -182,6 +194,7 @@ while True:
             .field("discharging", 1)\
         
         write_api.write(bucket, org, Error_code)
+         print("Discharging status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 12:
         #inform cell balance on
@@ -189,6 +202,7 @@ while True:
             .field("Cell Balance ON", 1)\
         
         write_api.write(bucket, org, Error_code)
+         print("CeLL balancing ON status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
     elif comm_code == 13:
         #inform cell balance off
@@ -196,6 +210,7 @@ while True:
             .field("Cell Balance OFF", 1)\
         
         write_api.write(bucket, org, Error_code)
+        print("CeLL balancing OFF status deployed to Grafana dashboard",end = "**")
         ser.write(return_code)
         
 
