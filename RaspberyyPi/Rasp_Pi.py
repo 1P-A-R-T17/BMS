@@ -74,9 +74,10 @@ def predict_soc():
         
         soc[i] = model.predict([[abs(cur_cell[i]), temp_cell, parallel_v[x]]])
         string = 'state of charge ' + str(i)
+        state_soc = float(soc[i])
         point  = Point("Battery") \
             .tag("Type", "State of charge") \
-            .field(string, soc[i]) \
+            .field(string, state_soc) \
     
         write_api.write(bucket, org, point)
         
@@ -171,7 +172,6 @@ while True:
         read_totalamps()
     elif comm_code == 5:
         read_temperature()
-        predict_soc()
     elif comm_code == 6:
         #inform influxdb of overvoltage
         Error_code = Point("Battery_error") \
