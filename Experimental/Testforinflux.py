@@ -52,6 +52,8 @@ def predict_soc():
             .field(string, soc[j]) \
     
         write_api.write(bucket, org, point)
+    
+    print("Sent SOC")
 
 for i in range(1000):
     toc = time.perf_counter()

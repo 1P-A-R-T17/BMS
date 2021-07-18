@@ -95,7 +95,7 @@ void Temperature_sense()
     select_Multiplexer_Pin(tempPin);
     delay(5);
     temp = (analogRead(temp_function_output) * 4.73) / 1023.0;
-    temp_sense[tempPin] = (temp * 10.00);
+    temp_sense[tempPin] = (temp * 100.00);
     temp = 0.0;
     average = average + temp_sense[tempPin];
     delay(1);

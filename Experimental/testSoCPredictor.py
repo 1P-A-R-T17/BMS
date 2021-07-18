@@ -11,9 +11,9 @@ from tensorflow import keras
 
 model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
 
-current = 0
+current = 3
 temperature = 15
-voltage = 4.12238
+voltage = 4
 
 input = [[current, temperature, voltage]]
 
