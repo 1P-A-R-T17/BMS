@@ -108,6 +108,10 @@ void Temperature_sense()
   incoming_data = Serial.read();
   //if(incoming_data == comm_code){
   Serial.println(average);
+  turnOff(28);
+  turnOff(27);
+  turnOff(26);
+  turnOff(25);  
 }
 
 void current_sensing() 
@@ -122,7 +126,7 @@ void current_sensing()
     select_Multiplexer_Pin(cur_Pin);
     delay(5);
     raw_voltage = (analogRead(current_function_output) / 1023.0) * 4730; //converts digital value to mV
-    voltage = ((raw_voltage - offsetVoltage) / (sensetivity)); //stores the current sensed in array
+    voltage = ((raw_voltage - offsetVoltage) / (sensetivity));
     current_sense[cur_Pin] = voltage;
     while (!Serial.available()) 
     {
@@ -135,6 +139,10 @@ void current_sensing()
     delay(1);
     //}
   }
+  turnOff(28);
+  turnOff(27);
+  turnOff(26);
+  turnOff(25);
 }
 
 void voltage_sensing() 
