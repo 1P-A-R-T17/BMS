@@ -31,7 +31,7 @@ void select_Multiplexer_Pin(byte pin)
 {
   if (pin > total_cells)
     return; // Exit the function if it is out of bound
-  for (auto i = 0; i < 4; i++) //for each element of the select_line_pins array ,loop runs 4 times.
+  for (int i = 0; i < 4; i++) //for each element of the select_line_pins array ,loop runs 4 times.
   {
     if (pin & (1 << i)) //shifting the bits to activate the specific select lines
       turnOn(select_line_pins[i]); //digitalWrite(select_line_pins[i], HIGH)
@@ -108,6 +108,10 @@ void Temperature_sense()
   incoming_data = Serial.read();
   //if(incoming_data == comm_code){
   Serial.println(average);
+  turnOff(28);
+  turnOff(27);
+  turnOff(26);
+  turnOff(25);  
 }
 
 void current_sensing() 
@@ -122,7 +126,7 @@ void current_sensing()
     select_Multiplexer_Pin(cur_Pin);
     delay(5);
     raw_voltage = (analogRead(current_function_output) / 1023.0) * 4730; //converts digital value to mV
-    voltage = ((raw_voltage - offsetVoltage) / (sensetivity)); //stores the current sensed in array
+    voltage = ((raw_voltage - offsetVoltage) / (sensetivity));
     current_sense[cur_Pin] = voltage;
     while (!Serial.available()) 
     {
@@ -135,6 +139,10 @@ void current_sensing()
     delay(1);
     //}
   }
+  turnOff(28);
+  turnOff(27);
+  turnOff(26);
+  turnOff(25);
 }
 
 void voltage_sensing() 
@@ -146,7 +154,7 @@ void voltage_sensing()
   Serial.println(comm_code);
   for (int pin = A0; pin < A3; pin++) //(int pin = 97; pin > 97 - series_cells; pin--)
   {
-    voltages[i] = (analogRead(pin) * (5.00 / 1024.00) * 4.7951807);
+    voltages[i] = (analogRead(pin) * (5.00 / 1024.00) * 4.79518);
     while (!Serial.available()) 
     {
       //do nothing
