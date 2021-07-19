@@ -27,14 +27,14 @@ totamp = 0
 soc = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 CSV_COLUMN_NAMES = ['Current', 'Temperature', 'Voltage', 'SoC']
-df = pd.read_csv('C:\\Users\\rachi\\Desktop\\BMS_dataset.csv', names = CSV_COLUMN_NAMES, header = 0)
+df = pd.read_csv('C:\\Users\\rachi\\Desktop\\BMS_Training.csv', names = CSV_COLUMN_NAMES, header = 0)
 #df.loc[:, 'Temperature'] = 25
 current = df.pop('Current')
 temperature = df.pop('Temperature')
 voltage = df.pop('Voltage')
 soc = df.pop('SoC')
 
-model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
+model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor_new.h5')
 
 def predict_soc():
     for j in range(9):
@@ -45,11 +45,13 @@ def predict_soc():
         else:
             x=2
         
-        soc[j] = model.predict([[cur_cell[j], temp_cell[j], parallel_v[x]]])
+        soc[j] = model.predict([[cur_cell[j], temp, parallel_v[x]]])
         string = 'state of charge ' + str(j)
+        state_soc = float(soc[j])
+        #print(soc[j])
         point  = Point("Battery") \
             .tag("Type", "State of charge") \
-            .field(string, soc[j]) \
+            .field(string, state_soc) \
     
         write_api.write(bucket, org, point)
     
@@ -93,17 +95,14 @@ for i in range(1000):
     write_api.write(bucket, org, point)
     
     temp = float(temperature[i])
-    for j in range(9):
-        #temp_cell[j] = temperature[i]
-        string = 'temperature' + str(j)
-        point = Point("Battery") \
-            .tag("Type","temperature") \
-            .field(string, temp) \
+    point = Point("Battery") \
+        .tag("Type","temperature") \
+        .field("average_temperature", temp) \
                 
-        write_api.write(bucket, org, point)
-        predict_soc()
+    write_api.write(bucket, org, point)
+    predict_soc()
 
-    soh = 1.00
+    soh = 0.99
     point = Point("Battery") \
         .tag("Type", "State of Health") \
         .field("SoH", soh)
@@ -151,13 +150,13 @@ for i in range(1000):
     
     
     Error_code = Point("Battery_error") \
-        .field("Cell Balance ON", 1)\
+        .field("Cell Balance ON", 0)\
         
     write_api.write(bucket, org, Error_code)
 
 
     Error_code = Point("Battery_error") \
-        .field("Cell Balance OFF", 0)\
+        .field("Cell Balance OFF", 1)\
         
     write_api.write(bucket, org, Error_code)
     

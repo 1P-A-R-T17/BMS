@@ -250,6 +250,14 @@ bool over_current(float cellcurrent)
       //do nothing
     }
     incoming_data = Serial.read();
+    turnOff(31);
+    turnOff(32);
+    turnOff(33);
+    turnOff(34);
+    turnOff(35);
+    turnOff(36);
+    analogWrite(13, 0);
+    analogWrite(4, 0);
     return 1;
     //stop the program
   }
@@ -479,7 +487,7 @@ void loop()
   if (voltage_protection()) 
   {
     turnOff(relayPin);
-    delay(60000);
+    delay(20000);
   } 
   else if (Thermal_management()) 
   {
@@ -488,7 +496,7 @@ void loop()
   else if (over_current(cellcurrent)) 
   {
     turnOff(relayPin);
-    delay(60000);
+    delay(20000);
   } 
   else 
   {

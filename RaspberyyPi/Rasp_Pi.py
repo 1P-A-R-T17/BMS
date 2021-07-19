@@ -55,7 +55,7 @@ Error_code = Point("Battery_error") \
         
 write_api.write(bucket, org, Error_code)
 
-model = keras.models.load_model('C:\\Users\\rachi\\Desktop\\soc_predictor.h5')
+model = keras.models.load_model('/home/pi/Desktop/BMS/NeuralNetwok/New_Neueral_netwok/soc_predictor_new.h5')
 
 return_code = 1
 
