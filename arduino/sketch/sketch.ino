@@ -49,8 +49,10 @@ float total_current_sensing()
   int incoming_data = 0;
   Serial.println(comm_code);
   float adcValue = analogRead(adcVoltage_pin);
-  float cellcurrent = (adcValue / 1023.0) * 4730; //converts digital value to mV
-  total_current = ((cellcurrent - offsetVoltage) / (sensetivity));
+  for (int i=7; i<9; i++)
+  {
+    total_current = total_current + current_sense[i];
+  }
   while (!Serial.available()) 
   {
     //do nothing
@@ -242,7 +244,7 @@ bool over_current(float cellcurrent)
   //Over Current protection
   int comm_code = 9;
   int incoming_data = 0;
-  if (cellcurrent > 1.200 || cellcurrent < -3.000) 
+  if (cellcurrent > 0.45 || cellcurrent < -2.9) 
   {
     Serial.println(comm_code);
     while (!Serial.available()) 
